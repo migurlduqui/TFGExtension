@@ -31,4 +31,5 @@ def control_server():
 
     return "thanks"
 
+#conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
