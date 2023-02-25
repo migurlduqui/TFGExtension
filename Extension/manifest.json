@@ -10,11 +10,13 @@
         {
           "matches": ["<all_urls>"],
           "css": [],
-          "js": ["content_script.js"],
-          "run_at": "document_start"
+          "js": ["content_script.js"]
+          
         }
       ],
     "permissions": [
+        "alarms",
+        "history",
         "debugger",
         "activeTab",
         "scripting",

