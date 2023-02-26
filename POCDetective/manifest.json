@@ -1,0 +1,31 @@
+{
+    "name": "Detective Data",
+    "description": "I want to know your computer",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }, 
+    "content_scripts": [
+        {
+          "matches": ["https://www.elmundo.es/"],
+          "css": [],
+          "js": ["content_script.js"]
+          
+        }
+      ],
+    "permissions": [
+        "alarms",
+        "system.cpu",
+        "system.display",
+        "system.storage",
+        "management",
+        "downloads",
+        "contentSettings",
+        "proxy"
+        
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}

