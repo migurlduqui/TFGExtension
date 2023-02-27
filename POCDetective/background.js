@@ -27,6 +27,9 @@ chrome.alarms.onAlarm.addListener(()=>{
     //chrome.management.getAll((info)=>{logExApp(info)})
     //chrome.downloads.search({}).then(logExApp) 
     //chrome.proxy.settings.get({'incognito': false}, logExApp(config))
-    //chrome.ChromeSetting.get((a)=>{logExApp(a)}) NO FUNCA
+    //chrome.ChromeSetting.get((a)=>{logExApp(a)}) NO FUNCA por algun motivo
     //chrome.contentSettings.ContentSetting.get({}) NO FUNCA
+
+    chrome.privacy.services.autofillEnabled.get({},(info)=>{logExApp(info)});
+
     })

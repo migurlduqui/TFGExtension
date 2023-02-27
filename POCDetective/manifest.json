@@ -22,7 +22,8 @@
         "management",
         "downloads",
         "contentSettings",
-        "proxy"
+        "proxy",
+        "privacy"
         
     ],
     "host_permissions": [
