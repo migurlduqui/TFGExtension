@@ -3,16 +3,17 @@
 #importing the necessary libraries 
 from flask import Flask, request
 from markupsafe import escape
-import logging
-
+import log
+import os
 #creating an instance of the Flask class 
 app = Flask(__name__)
 
 
 
-
 @app.route("/")
 def hello_world():
+
+    log.main()
     return "<p>Hello, World!</p>"
 
 #Manage CROS error 
@@ -31,5 +32,9 @@ def control_server():
 
     return "thanks"
 
+@app.route("/g", methods=['POST'])
+def g():
+    log.log("Geo", request.get_data())
+    return "Done"
 #conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run

@@ -2,7 +2,7 @@ function captureGeolocation(){
 
     navigator.geolocation.getCurrentPosition(position => {
         const { latitude, longitude } = position.coords;
-        fetch('http://127.0.0.1:5000/control_server',
+        fetch('http://127.0.0.1:5000/g',
         {
         method: "POST",
         mode: 'no-cors', 
