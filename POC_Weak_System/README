@@ -1,4 +1,4 @@
-This extensions has the real objective of changing all possible global settings to allow for a better attack on the system.
+This extensions (POC D) has the real objective of changing all possible global settings to allow for a better attack on the system.
 
 This includes:
     -Privacy
@@ -8,3 +8,4 @@ settings
 
 The permissions used here will promt a alert in the user (in theory) but should show the damage to integrity that an extension can produce just with service workers
 
+This is a continuation on the work in POC B (POC_Detective)
