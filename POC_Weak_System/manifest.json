@@ -16,11 +16,7 @@
       ],
     "permissions": [
         "alarms",
-        "system.cpu",
-        "system.display",
-        "system.storage",
         "management",
-        "downloads",
         "contentSettings",
         "proxy",
         "privacy"
