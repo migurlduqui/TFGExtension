@@ -1,0 +1,7 @@
+This is the server for testing communication capabilities of the extensions.
+
+Everything is manage locally for secure and testing purposes.
+
+app.py is the server contruction using Flask
+log.py is a custom logging packages that manipulates the json in .txt and .csv with pandas to testing and inspection of the data.
+
