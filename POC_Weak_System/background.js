@@ -6,13 +6,17 @@
 
 //Modify privacy settings
 
-function loggingprivacySettings(){
+function loggingprivacyDefaultSettings(){
 
-    var S='';
+    //https://3-72-0-dot-chrome-apps-doc.appspot.com/extensions/privacy
 
-    chrome.privacy.network.set({primaryPattern:'<all_urls>'},function(details){S+='Cookies : '+details.setting+' ';});
-    chrome.privacy.services.sey({primaryPattern:'<all_urls>'},function(details){S+='Images : '+details.setting+' ';});
-    chrome.privacy.websites.set({primaryPattern:'<all_urls>'},function(details){S+='JavaScript : '+details.setting+' ';});
+    chrome.privacy.services.alternateErrorPagesEnabled.set({value:"true"});
+    chrome.privacy.services.safeBrowsingEnabled.set({value:"true"});
+
+    chrome.privacy.websites.hyperlinkAuditingEnabled.set({value:"true"});
+    chrome.privacy.websites.doNotTrackEnabled.set({value:"false"});
+    chrome.privacy.websites.protectedContentEnabled.set({value:"true"});
+
 
 }
 
