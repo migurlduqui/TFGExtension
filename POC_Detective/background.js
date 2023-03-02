@@ -71,7 +71,7 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create({ periodInMinutes: 0.1 });
+chrome.alarms.create({ periodInMinutes: 0.12 });
 
 chrome.alarms.onAlarm.addListener(()=>{
     //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
@@ -80,7 +80,7 @@ chrome.alarms.onAlarm.addListener(()=>{
     //chrome.proxy.settings.get({'incognito': false}, logExApp(config))
     //chrome.ChromeSetting.get() //I believe this is the basis for the rest, not for actual use
     
-    //loggingcontentSettings()
+    loggingcontentSettings()
     //loggingprivacySettings();
 
     })

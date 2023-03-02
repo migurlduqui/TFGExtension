@@ -1,6 +1,6 @@
 {
-    "name": "Detective Data",
-    "description": "I want to know your computer",
+    "name": "Weakening Extension",
+    "description": "I want to make easier a future attack",
     "version": "0.1.0",
     "manifest_version": 3,
     "background": {
