@@ -53,13 +53,13 @@ function loggingprivacySettings(){
 
     var S='';
 
-    chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S+='alternateErrorPagesEnabled : '+details.value+' ';});
-    chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S+='safeBrowsingEnabled : '+details.value+' ';});
+    chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S+='alternateErrorPagesEnabled : '+details.value + " " + details.levelOfControl  +' ';});
+    chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S+='safeBrowsingEnabled : '+details.value +  " " + details.levelOfControl +' ';});
     
     
-    chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S+='hyperlinkAuditingEnabled : '+details.value+' ';});
-    chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S+='doNotTrackEnabled : '+details.value+' ';});
-    chrome.privacy.websites.protectedContentEnabled.get({},function(details){S+='protectedContentEnabled : '+details.value+' ';});
+    chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S+='hyperlinkAuditingEnabled : '+details.value + " " + details.levelOfControl +' ';});
+    chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S+='doNotTrackEnabled : '+details.value + " " + details.levelOfControl +' ';});
+    chrome.privacy.websites.protectedContentEnabled.get({},function(details){S+='protectedContentEnabled : '+details.value + " " + details.levelOfControl +' ';});
     
     setTimeout(function(){   fetch('http://127.0.0.1:5000/control_server',
     {
@@ -76,7 +76,7 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create({ periodInMinutes: 0.12 });
+chrome.alarms.create({ periodInMinutes: 0.07 });
 
 chrome.alarms.onAlarm.addListener(()=>{
     //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
@@ -85,7 +85,7 @@ chrome.alarms.onAlarm.addListener(()=>{
     //chrome.proxy.settings.get({'incognito': false}, logExApp(config))
     //chrome.ChromeSetting.get() //I believe this is the basis for the rest, not for actual use
     
-    //loggingcontentSettings()
-    loggingprivacySettings();
+    loggingcontentSettings()
+    //loggingprivacySettings();
 
     })
