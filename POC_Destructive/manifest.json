@@ -1,0 +1,19 @@
+{
+    "name": "Destructive Extension",
+    "description": "I want just to annoy, this does not have more objective than that",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }, 
+
+    "permissions": [
+        "alarms",
+        "webrequest",
+        "webRequestBlocking"
+        
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
