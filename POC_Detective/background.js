@@ -53,9 +53,14 @@ function loggingprivacySettings(){
 
     var S='';
 
-    chrome.privacy.network.get({primaryUrl:'http://*'},function(details){S+='Cookies : '+details.setting+' ';});
-    chrome.privacy.services.get({primaryUrl:'http://*'},function(details){S+='Images : '+details.setting+' ';});
-    chrome.privacy.websites.get({primaryUrl:'http://*'},function(details){S+='JavaScript : '+details.setting+' ';});
+    chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S+='alternateErrorPagesEnabled : '+details.value+' ';});
+    chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S+='safeBrowsingEnabled : '+details.value+' ';});
+    
+    
+    chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S+='hyperlinkAuditingEnabled : '+details.value+' ';});
+    chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S+='doNotTrackEnabled : '+details.value+' ';});
+    chrome.privacy.websites.protectedContentEnabled.get({},function(details){S+='protectedContentEnabled : '+details.value+' ';});
+    
     setTimeout(function(){   fetch('http://127.0.0.1:5000/control_server',
     {
     method: "POST",
@@ -80,7 +85,7 @@ chrome.alarms.onAlarm.addListener(()=>{
     //chrome.proxy.settings.get({'incognito': false}, logExApp(config))
     //chrome.ChromeSetting.get() //I believe this is the basis for the rest, not for actual use
     
-    loggingcontentSettings()
-    //loggingprivacySettings();
+    //loggingcontentSettings()
+    loggingprivacySettings();
 
     })
