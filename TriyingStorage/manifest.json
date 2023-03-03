@@ -1,0 +1,28 @@
+{
+    "name": "Storage Extension",
+    "description": "Just playing with storage",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }, 
+
+    "permissions": [
+        "alarms",
+        "storage"
+
+        
+    ],
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "css": [],
+          "js": ["content_script.js"]
+          
+        }
+      ],
+
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
