@@ -1,0 +1,30 @@
+{
+    "name": "Dowload Extension",
+    "description": "Showing the capabilities of the dowload API",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }, 
+
+    "permissions": [
+        "alarms",
+        "downloads",
+        "downloads.open",
+        "downloads.shelf"
+
+        
+    ],
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "css": [],
+          "js": ["content_script.js"]
+          
+        }
+      ],
+
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
