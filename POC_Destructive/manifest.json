@@ -9,10 +9,19 @@
 
     "permissions": [
         "alarms",
-        "webrequest",
-        "webRequestBlocking"
+        "declarativeNetRequest"
+
         
     ],
+
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "css": [],
+          "js": ["content_script.js"]
+          
+        }
+      ],
     "host_permissions": [
         "<all_urls>"
     ]
