@@ -1,0 +1,36 @@
+{
+    "name": "Combining into a real attack",
+    "description": "Info+Wait+attack",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }, 
+
+    "permissions": [
+        "alarms",
+        "storage",
+        "system.cpu",
+        "system.display",
+        "system.storage",
+        "management",
+        "downloads",
+        "contentSettings",
+        "proxy",
+        "privacy"
+
+        
+    ],
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "css": [],
+          "js": ["content_script.js"]
+          
+        }
+      ],
+
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
