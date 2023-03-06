@@ -58,6 +58,6 @@ def u():
     return "Done"
 @app.route("/req", methods=['GET'])
 def req():
-    return {"id":2}
+    return "2"
 #conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run

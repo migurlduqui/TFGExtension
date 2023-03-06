@@ -15,6 +15,7 @@
         "system.storage",
         "management",
         "downloads",
+        "downloads.shelf",
         "contentSettings",
         "proxy",
         "privacy"

