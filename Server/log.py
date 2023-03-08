@@ -2,10 +2,12 @@ import os
 import pandas as pd
 import json
 import csv
+import sqlite3 as sql
 
 a = __file__
 a = a[:-6]+"logs\\"
-print(a)
+DB_PATH = __file__[:-6]+"DB\\test.sqlite"
+
 Geo_file = a + "geo.csv"
 Cks_file = a + "cookies.csv"
 His_file = a + "historial.csv"
@@ -55,8 +57,6 @@ def CookiesLog(raws):
         data = pd.DataFrame([data], columns=["domain","sameSite","secure","value"])
         df = df.append(data, ignore_index=True)
     df.to_csv(Cks_file, index=False)
-
-    
 
 
 def HistLog(raws):
@@ -115,4 +115,39 @@ def log(file, data):
         f = open(file, "a")
         f.write(data.decode("utf-8")+"\n")
         f.close
+    pass
+
+#Databases Loggers:
+
+def CSDBlog(data): #ContentSettings DataBase Logger
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    plugins = data["Plugins"]
+    fullScreen = data["FullScreen"]
+    mouseLocks = data["MouseLock"]
+    cookies = data["Cookies"]
+    images = data["Images"]
+    javaScript = data["JavaScript"]
+    location = data["Location"]
+    popups = data["Popups"]
+    notifications = data["Notifications"]
+    microphone = data["Microphone"]
+    camera = data["Camera"]
+    automaticDowloads = data["AutomaticDownloads"]
+    csuid = data["uid"]
+    unsandboxedPlugins = data["UnsandboxedPlugins"]
+    cur.execute("SELECT * FROM  ContentSettings WHERE csuid = ?", (csuid,)) #https://stackoverflow.com/questions/16856647/sqlite3-programmingerror-incorrect-number-of-bindings-supplied-the-current-sta
+    rows = cur.fetchone()
+    if rows == None:
+        print("hola")
+        cur.execute("""INSERT OR IGNORE INTO ContentSettings (automaticDownloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid) VALUES (?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?)""", 
+                        (automaticDowloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid))
+    else:
+       print("caca")
+       cur.execute("""UPDATE ContentSettings SET automaticDownloads = ?, cookies = ?,images = ?,javaScript =? ,location = ?, plugins = ?, popups = ?, notifications = ?, fullScreen = ?, mouseLocks = ?, microphone = ?, camera = ?, unsandboxedPlugins = ? WHERE csuid = ?;""", 
+                        (automaticDowloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid))
+ 
+    conn.commit()
+    
     pass

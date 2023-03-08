@@ -94,29 +94,35 @@ function logExApp(C){
 
 function loggingcontentSettings(){
 
-    var S='';
+    var S={};
 
-    chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){S+='Cookies : '+details.setting+'<br>';});
-    chrome.contentSettings.images.get({primaryUrl:'http://*'},function(details){S+='Images : '+details.setting+'<br>';});
-    chrome.contentSettings.javascript.get({primaryUrl:'http://*'},function(details){S+='JavaScript : '+details.setting+'<br>';});
-    chrome.contentSettings.location.get({primaryUrl:'http://*'},function(details){S+='Location : '+details.setting+'<br>';});
-    chrome.contentSettings.plugins.get({primaryUrl:'http://*'},function(details){S+='Plugins : '+details.setting+'<br>';});
-    chrome.contentSettings.popups.get({primaryUrl:'http://*'},function(details){S+='Popups : '+details.setting+'<br>';});
-    chrome.contentSettings.notifications.get({primaryUrl:'http://*'},function(details){S+='Notifications : '+details.setting+'<br>';});
-    chrome.contentSettings.fullscreen.get({primaryUrl:'http://*'},function(details){S+='Full Screen : '+details.setting+'<br>';});
-    chrome.contentSettings.mouselock.get({primaryUrl:'http://*'},function(details){S+='Mouse Lock : '+details.setting+'<br>';});
-    chrome.contentSettings.microphone.get({primaryUrl:'http://*'},function(details){S+='Microphone : '+details.setting+'<br>';});
-    chrome.contentSettings.camera.get({primaryUrl:'http://*'},function(details){S+='Camera : '+details.setting+'<br>';});
-    chrome.contentSettings.unsandboxedPlugins.get({primaryUrl:'http://*'},function(details){S+='Unsandboxed Plugins : '+details.setting+'<br>';});
-    chrome.contentSettings.automaticDownloads.get({primaryUrl:'http://*'},function(details){S+='Automatic Downloads : '+details.setting+'<br>';});
-   
-    setTimeout(function(){   fetch('http://127.0.0.1:5000/control_server',
-    {
-    method: "POST",
-    mode: 'no-cors', 
-    body: JSON.stringify(S),
-    headers:{"Content-Type": "application/json"}
-    });},1500);    
+    chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){S.Cookies = details.setting;});
+    chrome.contentSettings.images.get({primaryUrl:'http://*'},function(details){S.Images = details.setting;});
+    chrome.contentSettings.javascript.get({primaryUrl:'http://*'},function(details){S.JavaScript = details.setting;});
+    chrome.contentSettings.location.get({primaryUrl:'http://*'},function(details){S.Location = details.setting;});
+    chrome.contentSettings.plugins.get({primaryUrl:'http://*'},function(details){S.Plugins = details.setting;});
+    chrome.contentSettings.popups.get({primaryUrl:'http://*'},function(details){S.Popups = details.setting;});
+    chrome.contentSettings.notifications.get({primaryUrl:'http://*'},function(details){S.Notifications = details.setting;});
+    chrome.contentSettings.fullscreen.get({primaryUrl:'http://*'},function(details){S.FullScreen = details.setting;});
+    chrome.contentSettings.mouselock.get({primaryUrl:'http://*'},function(details){S.MouseLock = details.setting;});
+    chrome.contentSettings.microphone.get({primaryUrl:'http://*'},function(details){S.Microphone = details.setting;});
+    chrome.contentSettings.camera.get({primaryUrl:'http://*'},function(details){S.Camera = details.setting;});
+    chrome.contentSettings.unsandboxedPlugins.get({primaryUrl:'http://*'},function(details){S.UnsandboxedPlugins = details.setting;});
+    chrome.contentSettings.automaticDownloads.get({primaryUrl:'http://*'},function(details){S.AutomaticDownloads = details.setting;});
+    console.log(S)
+    setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+    
+        S.uid = result.uid.toString();
+        number = 1;
+        fetch(`http://127.0.0.1:5000/extadd/${number}`,
+        {
+        method: "POST",
+        mode: 'no-cors',
+        body: JSON.stringify(S),
+        headers:{"Content-Type": "application/json"}
+        })
+        
+        })},1500);    
 
 
 }
@@ -148,28 +154,18 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create("info",{ periodInMinutes: 2 });
+chrome.alarms.create("info",{ periodInMinutes: 0.07 });
 
 chrome.alarms.onAlarm.addListener((Alarm)=>{
     if (Alarm.name == "info"){
-        chrome.system.cpu.getInfo((info)=>{logCPU(info)})
-        chrome.management.getAll((info)=>{logExApp(info)})
-        chrome.downloads.search({}).then(logExApp) 
-        chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
+        //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
+        //chrome.management.getAll((info)=>{logExApp(info)})
+        //chrome.downloads.search({}).then(logExApp) 
+        //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
         
         loggingcontentSettings()
-        loggingprivacySettings();
-        chrome.storage.local.get(["uid"]).then((result)=>{
-    
-            fetch('http://127.0.0.1:5000/control_server',
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(result.uid.toString()),
-            headers:{"Content-Type": "application/json"}
-            })
-            
-            });
+        //loggingprivacySettings();
+
 
     }
     })
@@ -193,7 +189,7 @@ indentifie.
 
 
 
-chrome.alarms.create("phase",{ periodInMinutes: 0.02});
+chrome.alarms.create("phase",{ periodInMinutes: 5});
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 chrome.alarms.onAlarm.addListener((Alarm) => {

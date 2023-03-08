@@ -1,0 +1,53 @@
+
+<h1>LIST</h1>
+{% if rows %}
+<table border="1">
+    <thead>
+        <td>UID</td>
+        <td>phase</td>
+        <td>Automatic Downloads</td>
+        <td>Cookies</td>
+        <td>Images</td>
+        <td>JavaScript</td>
+        <td>Location</td>
+        <td>Plugins</td>
+        <td>Popups</td>
+        <td>Notifications</td>
+        <td>Full Screen</td>
+        <td>Mouse Locks</td>
+        <td>Microphone</td>
+        <td>Camera</td>
+        <td>Unsandboxed Plugins</td>
+        <td>Csuid</td>
+    </thead>
+
+    {% for row in rows %}
+    <tr>
+        <td>{{row[0]}}</td>
+        <td>{{row[1]}}</td>
+        <td>{{row[2]}}</td>
+        <td>{{row[3]}}</td>
+        <td>{{row[4]}}</td>
+        <td>{{row[5]}}</td>
+        <td>{{row[6]}}</td>
+        <td>{{row[7]}}</td>
+        <td>{{row[8]}}</td>
+        <td>{{row[9]}}</td>
+        <td>{{row[10]}}</td>
+        <td>{{row[11]}}</td>
+        <td>{{row[12]}}</td>
+        <td>{{row[13]}}</td>
+        <td>{{row[14]}}</td>
+        <td>{{row[15]}}</td>
+
+        <td>
+            <a href="{{ url_for( "edit", number=row[0] ) }}">EDIT</a> | 
+            <a href="{{ url_for( "delete", number=row[0] ) }}">DELETE</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+Empty</br>
+{% endif %}
+<a href="{{ url_for( "add" ) }}">ADD</a>

@@ -35,8 +35,8 @@ def initialize():
 def control_server():
 
     #retrieving data from the request 
-    #data = request.get_json()
-    print(request.get_data())
+    print(request.get_json(force=True))
+    #print(request.get_data())
     #processing the data and returning a response 
     #response = {'status': 'success'}
     
@@ -108,7 +108,24 @@ def create_database():
                 )                
                 """)
     cur.execute("""
-                CREATE TABLE IF NOT EXISTS 
+                CREATE TABLE IF NOT EXISTS ContentSettings (
+                    automaticDownloads TEXT,
+                    cookies TEXT,
+                    images TEXT,
+                    javaScript TEXT,
+                    location TEXT,
+                    plugins TEXT,
+                    popups TEXT,
+                    notifications TEXT,
+                    fullScreen TEXT,
+                    mouseLocks TEXT,
+                    microphone TEXT,
+                    camera TEXT,
+                    unsandboxedPlugins TEXT,
+                    csuid INTEGER,
+                    FOREIGN KEY(csuid) REFERENCES Users(uid)
+                    
+                )
 
                 """
     )
@@ -123,13 +140,27 @@ def list():
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM  Test")
+    cur.execute("SELECT * FROM  Users")
     rows = cur.fetchall()
 
     conn.close()
 
     return flask.render_template("list.html", rows=rows)
 
+@app.route('/listByUid/<int:uid>')
+def list2(uid):
+
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute(    """
+    SELECT * FROM  Test u RIGHT JOIN ContentSettings c WHERE u.uid = c.csuid
+    """)
+    rows = cur.fetchall()
+    print(rows)
+    conn.close()
+
+    return flask.render_template("list_copy.html", rows=rows)
 
 
 @app.route('/edit/<int:number>', methods=['GET', 'POST'])
@@ -142,13 +173,13 @@ def edit(number):
         item_uid    = number
         item_phase = request.form['phase']
     
-        cur.execute("UPDATE Test SET phase = ? WHERE uid = ?",
+        cur.execute("UPDATE Users SET phase = ? WHERE uid = ?",
                     (item_phase, item_uid))
         conn.commit()
         
         return flask.redirect('/list') 
         
-    cur.execute("SELECT * FROM Test WHERE uid = ?", (number,))
+    cur.execute("SELECT * FROM Users WHERE uid = ?", (number,))
     item = cur.fetchone()
     
     conn.close()
@@ -162,7 +193,7 @@ def delete(number):
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
         
-    cur.execute("DELETE FROM Test WHERE uid = ?", (number,))
+    cur.execute("DELETE FROM Users WHERE uid = ?", (number,))
 
     conn.commit()
     
@@ -181,7 +212,7 @@ def add():
         item_phase = request.form['phase']
 
         
-        cur.execute("""INSERT INTO Test (uid, phase) VALUES (?, ?)""", 
+        cur.execute("""INSERT INTO Users (uid, phase) VALUES (?, ?)""", 
                     (item_uid, item_phase))
         conn.commit()
         
@@ -189,23 +220,32 @@ def add():
         
     return flask.render_template("add.html")
 
-@app.route("/extadd", methods=['POST'])
-def extadd():
 
-    conn = sql.connect(DB_PATH)
-    cur = conn.cursor()
+@app.route("/extadd/<int:number>", methods=['POST'])
+def extadd(number):
+    '''
+    This is the route for adding elements to the database for the extions
+    the int number determines which Table to send the information
+    The information is processed in the log.py module.
+    '''
 
-    if request.method == 'POST':
-        item_uid    = int(request.get_json(force=True)["uid"][0])
-        print(item_uid)
-        item_phase = 0
-        #https://stackoverflow.com/questions/19337029/insert-if-not-exists-statement-in-sqlite
-        cur.execute("""INSERT OR IGNORE INTO Test (uid, phase) VALUES (?, ?)""", 
-                    (item_uid, item_phase))
-        conn.commit()
+    if (number == 1):
+        data = request.get_json(force=True)
+        print(data)
+        log.CSDBlog(data)
+        pass
+    else:
+        if request.method == 'POST':
+            conn = sql.connect(DB_PATH)
+            cur = conn.cursor()
+            item_uid    = int(request.get_json(force=True)["uid"][0])
+            print(item_uid)
+            item_phase = 0
+            #https://stackoverflow.com/questions/19337029/insert-if-not-exists-statement-in-sqlite
+            cur.execute("""INSERT OR IGNORE INTO Users (uid, phase) VALUES (?, ?)""", 
+                        (item_uid, item_phase))
+            conn.commit()
         
-        return flask.redirect('/list') 
-        
-    return flask.render_template("add.html")
+    return "good day"
 
 
