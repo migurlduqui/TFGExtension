@@ -153,7 +153,7 @@ def list2(uid):
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
 
-    cur.execute(    """
+    cur.execute("""
     SELECT * FROM  Test u RIGHT JOIN ContentSettings c WHERE u.uid = c.csuid
     """)
     rows = cur.fetchall()
