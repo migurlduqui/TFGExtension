@@ -40,10 +40,6 @@
         <td>{{row[14]}}</td>
         <td>{{row[15]}}</td>
 
-        <td>
-            <a href="{{ url_for( "edit", number=row[0] ) }}">EDIT</a> | 
-            <a href="{{ url_for( "delete", number=row[0] ) }}">DELETE</a>
-        </td>
     </tr>
     {% endfor %}
 </table>

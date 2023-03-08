@@ -75,7 +75,8 @@ def req(uid):
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
     uid = [int(uid)]
-    cur.execute("SELECT phase FROM Test WHERE uid = ?",
+    print(uid)
+    cur.execute("SELECT phase FROM Users WHERE uid = ?",
                     (uid))
     rows = cur.fetchone()
     conn.close()
@@ -83,7 +84,9 @@ def req(uid):
         print("Not in Database: ", uid)
         return "False"
     else:
+        print(rows)
         rows = rows[0]
+        print(rows)
         return str(rows)
 
     
@@ -154,7 +157,7 @@ def list2(uid):
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT * FROM  Test u RIGHT JOIN ContentSettings c WHERE u.uid = c.csuid
+    SELECT * FROM  Users u RIGHT JOIN ContentSettings c WHERE u.uid = c.csuid
     """)
     rows = cur.fetchall()
     print(rows)
