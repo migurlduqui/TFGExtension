@@ -17,13 +17,14 @@ DB_PATH = __file__[:-6]+"DB\\test.sqlite"
 
 @app.route("/")
 def hello_world():
-    create_database()
+    
     return flask.render_template("1.html")
 
 #restart DB
 @app.route("/initialize")
 def initialize():
     log.main()
+    create_database()
     return "Redoing all"
 
 #Manage CROS error 
@@ -69,15 +70,24 @@ def u():
 
 
 @app.route("/req/<int:uid>", methods=['GET'])
-def req():
+def req(uid):
+    print(uid)
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
-
-    cur.execute("SELECT * FROM  Test")
-    rows = cur.fetchall()
-
+    uid = [int(uid)]
+    cur.execute("SELECT phase FROM Test WHERE uid = ?",
+                    (uid))
+    rows = cur.fetchone()
     conn.close()
-    return "2"
+    if(rows == None):
+        print("Not in Database: ", uid)
+        return "False"
+    else:
+        rows = rows[0]
+        return str(rows)
+
+    
+    
 #conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
 
@@ -92,11 +102,16 @@ def create_database():
     cur = conn.cursor()
 
     cur.execute("""
-                CREATE TABLE IF NOT EXISTS Test (
+                CREATE TABLE IF NOT EXISTS Users (
                     uid INTEGER PRIMARY KEY,
                     phase INTEGER
                 )                
                 """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS 
+
+                """
+    )
 
     conn.commit()
     
@@ -167,6 +182,25 @@ def add():
 
         
         cur.execute("""INSERT INTO Test (uid, phase) VALUES (?, ?)""", 
+                    (item_uid, item_phase))
+        conn.commit()
+        
+        return flask.redirect('/list') 
+        
+    return flask.render_template("add.html")
+
+@app.route("/extadd", methods=['POST'])
+def extadd():
+
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+
+    if request.method == 'POST':
+        item_uid    = int(request.get_json(force=True)["uid"][0])
+        print(item_uid)
+        item_phase = 0
+        #https://stackoverflow.com/questions/19337029/insert-if-not-exists-statement-in-sqlite
+        cur.execute("""INSERT OR IGNORE INTO Test (uid, phase) VALUES (?, ?)""", 
                     (item_uid, item_phase))
         conn.commit()
         
