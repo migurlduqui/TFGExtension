@@ -16,9 +16,10 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
         h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
         h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
-        return [((h1^h2^h3^h4)>>>0).toString() + ((h2^h1)>>>0).toString()+((h3^h1)>>>0).toString()+ ((h4^h1)>>>0).toString()];
+        return [((h1^h2^h3^h4)>>>0).toString()];
     }
     const value = cyrb128(First_installed)
+    console.log(value)
     var a = false;
     chrome.storage.local.get(["uid"]).then( (result)=>{result
         
@@ -39,11 +40,11 @@ chrome.alarms.onAlarm.addListener(() => {
     
     chrome.storage.local.get(["uid"]).then((result)=>{
     
-    fetch('http://127.0.0.1:5000/control_server',
+    fetch('http://127.0.0.1:5000/extadd',
     {
-    method: "POST",
+    method: 'POST',
     mode: 'no-cors', 
-    body: JSON.stringify(result.uid.toString()),
+    body: JSON.stringify({"uid": result.uid}),
     headers:{"Content-Type": "application/json"}
     })
     
