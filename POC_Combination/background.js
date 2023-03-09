@@ -129,23 +129,29 @@ function loggingcontentSettings(){
 
 function loggingprivacySettings(){
 
-    var S='';
+    var S={};
 
-    chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S+='alternateErrorPagesEnabled : '+details.value + " " + details.levelOfControl  +' ';});
-    chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S+='safeBrowsingEnabled : '+details.value +  " " + details.levelOfControl +' ';});
+    chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S.alternateErrorPagesEnabledVal = details.value; S.alternateErrorPagesEnabledLev = details.levelOfControl ;});
+    chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S.safeBrowsingEnabledVal = details.value; S.safeBrowsingEnabledLev = details.levelOfControl ;});
     
     
-    chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S+='hyperlinkAuditingEnabled : '+details.value + " " + details.levelOfControl +' ';});
-    chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S+='doNotTrackEnabled : '+details.value + " " + details.levelOfControl +' ';});
-    chrome.privacy.websites.protectedContentEnabled.get({},function(details){S+='protectedContentEnabled : '+details.value + " " + details.levelOfControl +' ';});
+    chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S.hyperlinkAuditingEnabledVal = details.value; S.hyperlinkAuditingEnabledLev = details.levelOfControl;});
+    chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S.doNotTrackEnabledVal = details.value; S.doNotTrackEnabledLev = details.levelOfControl;});
+    chrome.privacy.websites.protectedContentEnabled.get({},function(details){S.protectedContentEnabledVal = details.value; S.protectedContentEnabledLev = details.levelOfControl;});
     
-    setTimeout(function(){   fetch('http://127.0.0.1:5000/control_server',
-    {
-    method: "POST",
-    mode: 'no-cors', 
-    body: JSON.stringify(S),
-    headers:{"Content-Type": "application/json"}
-    });},1500);    
+    setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+    
+        S.uid = result.uid.toString();
+        number = 2;
+        fetch(`http://127.0.0.1:5000/extadd/${number}`,
+        {
+        method: "POST",
+        mode: 'no-cors',
+        body: JSON.stringify(S),
+        headers:{"Content-Type": "application/json"}
+        })
+        
+        })},1500);    
 
 
 }
@@ -154,7 +160,7 @@ function loggingprivacySettings(){
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create("info",{ periodInMinutes: 10 });
+chrome.alarms.create("info",{ periodInMinutes: 0.02 });
 
 chrome.alarms.onAlarm.addListener((Alarm)=>{
     if (Alarm.name == "info"){
@@ -164,7 +170,7 @@ chrome.alarms.onAlarm.addListener((Alarm)=>{
         //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
         
         loggingcontentSettings()
-        //loggingprivacySettings();
+        loggingprivacySettings();
 
 
     }
@@ -189,7 +195,7 @@ indentifie.
 
 
 
-chrome.alarms.create("phase",{ periodInMinutes: 0.02});
+chrome.alarms.create("phase",{ periodInMinutes: 1});
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 chrome.alarms.onAlarm.addListener((Alarm) => {

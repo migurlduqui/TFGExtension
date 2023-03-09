@@ -132,6 +132,25 @@ def create_database():
 
                 """
     )
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS PrivacySettings (
+                alternateErrorPagesEnabledVal TEXT,
+                alternateErrorPagesEnabledLev TEXT,
+                safeBrowsingEnabledVal TEXT,
+                safeBrowsingEnabledLev TEXT,
+                hyperlinkAuditingEnabledVal TEXT,
+                hyperlinkAuditingEnabledLev TEXT,
+                doNotTrackEnabledVal TEXT,
+                doNotTrackEnabledLev TEXT,
+                protectedContentEnabledVal TEXT,
+                protectedContentEnabledLev TEXT,
+                psuid INTEGER,
+                FOREIGN KEY(psuid) REFERENCES Users(uid)
+
+
+                )
+    
+    """)
 
     conn.commit()
     
@@ -236,6 +255,11 @@ def extadd(number):
         data = request.get_json(force=True)
         print(data)
         log.CSDBlog(data)
+        pass
+    elif (number == 2):
+        data = data = request.get_json(force=True)
+        print(data)
+        log.PSDBlog(data)
         pass
     else:
         if request.method == 'POST':

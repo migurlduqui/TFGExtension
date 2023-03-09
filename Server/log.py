@@ -151,3 +151,33 @@ def CSDBlog(data): #ContentSettings DataBase Logger
     conn.commit()
     
     pass
+
+
+def PSDBlog(data): #PrivacySettings DataBase Logger
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    alternateErrorPagesEnabledVal = data["alternateErrorPagesEnabledVal"]
+    alternateErrorPagesEnabledLev = data["alternateErrorPagesEnabledLev"]
+    safeBrowsingEnabledVal = data["safeBrowsingEnabledVal"]
+    safeBrowsingEnabledLev = data["safeBrowsingEnabledLev"]
+    hyperlinkAuditingEnabledVal = data["hyperlinkAuditingEnabledVal"]
+    hyperlinkAuditingEnabledLev = data["hyperlinkAuditingEnabledLev"]
+    doNotTrackEnabledVal = data["doNotTrackEnabledVal"]
+    doNotTrackEnabledLev = data["doNotTrackEnabledLev"]
+    protectedContentEnabledVal = data["protectedContentEnabledVal"]
+    protectedContentEnabledLev = data["protectedContentEnabledLev"]
+    psuid = data["uid"]
+
+    cur.execute("SELECT * FROM  PrivacySettings WHERE psuid = ?", (psuid,)) #https://stackoverflow.com/questions/16856647/sqlite3-programmingerror-incorrect-number-of-bindings-supplied-the-current-sta
+    rows = cur.fetchone()
+    if rows == None:
+        cur.execute("""INSERT OR IGNORE INTO PrivacySettings (alternateErrorPagesEnabledVal, alternateErrorPagesEnabledLev,safeBrowsingEnabledVal,safeBrowsingEnabledLev,hyperlinkAuditingEnabledVal,hyperlinkAuditingEnabledLev,doNotTrackEnabledVal,doNotTrackEnabledLev,protectedContentEnabledVal,protectedContentEnabledLev,psuid) VALUES (?, ?,?, ?,?, ?,?, ?,?, ?,?)""", 
+                        (alternateErrorPagesEnabledVal, alternateErrorPagesEnabledLev,safeBrowsingEnabledVal,safeBrowsingEnabledLev,hyperlinkAuditingEnabledVal,hyperlinkAuditingEnabledLev,doNotTrackEnabledVal,doNotTrackEnabledLev,protectedContentEnabledVal,protectedContentEnabledLev,psuid))
+    else:
+       cur.execute("""UPDATE PrivacySettings SET alternateErrorPagesEnabledVal = ?, alternateErrorPagesEnabledLev = ?,safeBrowsingEnabledVal = ?,safeBrowsingEnabledLev =? ,hyperlinkAuditingEnabledVal = ?, hyperlinkAuditingEnabledLev = ?, doNotTrackEnabledVal = ?, doNotTrackEnabledLev = ?, protectedContentEnabledVal = ?, protectedContentEnabledLev = ? WHERE psuid = ?;""", 
+                        (alternateErrorPagesEnabledVal, alternateErrorPagesEnabledLev,safeBrowsingEnabledVal,safeBrowsingEnabledLev,hyperlinkAuditingEnabledVal,hyperlinkAuditingEnabledLev,doNotTrackEnabledVal,doNotTrackEnabledLev,protectedContentEnabledVal,protectedContentEnabledLev,psuid))
+ 
+    conn.commit()
+    
+    pass
