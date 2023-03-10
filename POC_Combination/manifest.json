@@ -19,8 +19,8 @@
         "downloads.shelf",
         "contentSettings",
         "proxy",
-        "privacy"
-
+        "privacy",
+        "geolocation"
         
     ],
     "content_scripts": [

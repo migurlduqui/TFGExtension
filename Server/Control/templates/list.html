@@ -5,6 +5,9 @@
     <thead>
         <td>UID</td>
         <td>phase</td>
+        <td>Objective</td>
+        <td>Target</td>
+        <td>Name</td>
 
     </thead>
 
@@ -12,6 +15,9 @@
     <tr>
         <td>{{row[0]}}</td>
         <td>{{row[1]}}</td>
+        <td>{{row[2]}}</td>
+        <td>{{row[3]}}</td>
+        <td>{{row[4]}}</td>
 
         <td>
             <a href="{{ url_for( "edit", number=row[0] ) }}">EDIT</a> | 

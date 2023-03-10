@@ -2,7 +2,7 @@
 
 #importing the necessary libraries
 import flask 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from markupsafe import escape
 import log
 import os
@@ -74,16 +74,16 @@ def req(uid):
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
     uid = [int(uid)]
-    cur.execute("SELECT phase FROM Users WHERE uid = ?",
+    cur.execute("SELECT * FROM Users WHERE uid = ?",
                     (uid))
     rows = cur.fetchone()
     conn.close()
+    print(type(rows))
     if(rows == None):
         print("Not in Database: ", uid)
         return "False"
     else:
-        rows = rows[0]
-        return str(rows)
+        return jsonify(phase = rows[1], obj =  rows[2], tar = rows[3], nam = rows[4])
 
     
     
@@ -103,7 +103,10 @@ def create_database():
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Users (
                     uid INTEGER PRIMARY KEY,
-                    phase INTEGER
+                    phase INTEGER,
+                    obj TEXT,
+                    tar TEXT,
+                    nam TEXT
                 )                
                 """)
     cur.execute("""
@@ -190,9 +193,12 @@ def edit(number):
     if request.method == 'POST':
         item_uid    = number
         item_phase = request.form['phase']
+        item_obj = request.form['obj']
+        item_tar = request.form['tar']
+        item_nam = request.form['nam']
     
-        cur.execute("UPDATE Users SET phase = ? WHERE uid = ?",
-                    (item_phase, item_uid))
+        cur.execute("UPDATE Users SET phase = ?, obj = ?, tar = ?, nam =? WHERE uid = ?",
+                    (item_phase, item_obj,item_tar, item_nam, item_uid))
         conn.commit()
         
         return flask.redirect('/list') 

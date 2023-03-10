@@ -1,5 +1,8 @@
 <h1>EDIT</h1>
 <form method="POST" action="{{ url_for( "edit", number=item[0] ) }}">
     Phase: <input name="phase" value="{{item[1]}}"/></br>
+    Objective: <input name="obj" value="{{item[2]}}"/></br>
+    Target: <input name="tar" value="{{item[3]}}"/></br>
+    Name: <input name="nam" value="{{item[4]}}"/></br>
     <button>UPDATE</button></br>
 </form>
