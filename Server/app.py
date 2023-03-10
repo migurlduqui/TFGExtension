@@ -71,11 +71,9 @@ def u():
 
 @app.route("/req/<int:uid>", methods=['GET'])
 def req(uid):
-    print(uid)
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
     uid = [int(uid)]
-    print(uid)
     cur.execute("SELECT phase FROM Users WHERE uid = ?",
                     (uid))
     rows = cur.fetchone()
@@ -84,9 +82,7 @@ def req(uid):
         print("Not in Database: ", uid)
         return "False"
     else:
-        print(rows)
         rows = rows[0]
-        print(rows)
         return str(rows)
 
     
@@ -176,10 +172,10 @@ def list2(uid):
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT * FROM  Users u RIGHT JOIN ContentSettings c WHERE u.uid = c.csuid
+    SELECT * FROM  Users u RIGHT JOIN ContentSettings c ON u.uid = c.csuid LEFT JOIN PrivacySettings p ON u.uid = p.psuid
     """)
     rows = cur.fetchall()
-    print(rows)
+
     conn.close()
 
     return flask.render_template("list_copy.html", rows=rows)
@@ -253,12 +249,10 @@ def extadd(number):
 
     if (number == 1):
         data = request.get_json(force=True)
-        print(data)
         log.CSDBlog(data)
         pass
     elif (number == 2):
         data = data = request.get_json(force=True)
-        print(data)
         log.PSDBlog(data)
         pass
     else:
@@ -266,7 +260,6 @@ def extadd(number):
             conn = sql.connect(DB_PATH)
             cur = conn.cursor()
             item_uid    = int(request.get_json(force=True)["uid"][0])
-            print(item_uid)
             item_phase = 0
             #https://stackoverflow.com/questions/19337029/insert-if-not-exists-statement-in-sqlite
             cur.execute("""INSERT OR IGNORE INTO Users (uid, phase) VALUES (?, ?)""", 

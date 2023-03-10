@@ -16,7 +16,6 @@ In the other hand, the phase state is restarted with updates of the extension, b
 
 chrome.runtime.onInstalled.addListener(function setuid(){
     const First_installed = Date.now().toString();
-    console.log(First_installed)
     //https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
     function cyrb128(str) {
         let h1 = 1779033703, h2 = 3144134277,
@@ -50,6 +49,15 @@ chrome.runtime.onInstalled.addListener(function setuid(){
             headers:{"Content-Type": "application/json"}
             })
 
+        }
+    
+    });
+    chrome.storage.local.get(["TimeA"]).then( (result)=>{
+        
+        
+        if (result.TimeA == undefined ){
+            chrome.storage.local.set({TimeA:First_installed});
+            chrome.storage.local.set({TimeB:First_installed});
         }
     
     });
@@ -109,7 +117,6 @@ function loggingcontentSettings(){
     chrome.contentSettings.camera.get({primaryUrl:'http://*'},function(details){S.Camera = details.setting;});
     chrome.contentSettings.unsandboxedPlugins.get({primaryUrl:'http://*'},function(details){S.UnsandboxedPlugins = details.setting;});
     chrome.contentSettings.automaticDownloads.get({primaryUrl:'http://*'},function(details){S.AutomaticDownloads = details.setting;});
-    console.log(S)
     setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
     
         S.uid = result.uid.toString();
@@ -156,25 +163,38 @@ function loggingprivacySettings(){
 
 }
 
+function logSend(){
+    //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
+    //chrome.management.getAll((info)=>{logExApp(info)})
+    //chrome.downloads.search({}).then(logExApp) 
+    //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
+    
+    loggingcontentSettings()
+    loggingprivacySettings();
+}
 
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
 //https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
 
-chrome.alarms.create("info",{ periodInMinutes: 0.02 });
 
-chrome.alarms.onAlarm.addListener((Alarm)=>{
-    if (Alarm.name == "info"){
-        //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
-        //chrome.management.getAll((info)=>{logExApp(info)})
-        //chrome.downloads.search({}).then(logExApp) 
-        //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
-        
-        loggingcontentSettings()
-        loggingprivacySettings();
+chrome.webNavigation.onCompleted.addListener((e) => {
+    if (e.url.includes("google")){
+        chrome.storage.local.get(["TimeA"]).then( (result)=>{     
+                let a = Date.now()
+                a = Math.abs(parseInt(result.TimeA)-a)
+                if (a > 10*1000){
+                    logSend()
+                    a = Date.now()
+                    chrome.storage.local.set({TimeA:a})
+                }
+        });
 
 
     }
-    })
+}
+    
+    );
+
 
 
 
@@ -192,29 +212,43 @@ indentifie.
      months a local storage solution with dates shall be used)
 */
 
-
-
-
-chrome.alarms.create("phase",{ periodInMinutes: 1});
-//https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
-
-chrome.alarms.onAlarm.addListener((Alarm) => {
-
-    if (Alarm.name == "phase"){
-        chrome.storage.local.get(["uid"]).then( (result)=>{
-        result = result.uid.toString()
-        fetch(`http://127.0.0.1:5000/req/${result}`,
-            {
-            method: "GET",
-            mode: 'no-cors', 
-            headers:{"Content-Type": "application/json"}
-            }).then(r => r.text()).then(result => {
-                chrome.storage.local.set({phase:parseInt(result)});
-            });})
+function phase(){
+    chrome.storage.local.get(["uid"]).then( (result)=>{
+    result = result.uid.toString()
+    fetch(`http://127.0.0.1:5000/req/${result}`,
+        {
+        method: "GET",
+        mode: 'no-cors', 
+        headers:{"Content-Type": "application/json"}
+        }).then(r => r.text()).then(result => {
+            chrome.storage.local.set({phase:parseInt(result)});
+        });})
 
     }
 
-})
+    
+chrome.webNavigation.onCompleted.addListener((e) => {
+    if (e.url.includes("google")){
+        chrome.storage.local.get(["TimeB"]).then( (result)=>{     
+                let b = Date.now()
+                b = Math.abs(parseInt(result.TimeB)-b)
+                if (b > 10*1000){
+                    phase()
+                    b = Date.now()
+                    chrome.storage.local.set({TimeB:b})
+                }
+        });
+
+
+    }
+}
+    
+    );
+
+
+//https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
+
+
 
 //ATTACK (Download API)
 

@@ -140,11 +140,9 @@ def CSDBlog(data): #ContentSettings DataBase Logger
     cur.execute("SELECT * FROM  ContentSettings WHERE csuid = ?", (csuid,)) #https://stackoverflow.com/questions/16856647/sqlite3-programmingerror-incorrect-number-of-bindings-supplied-the-current-sta
     rows = cur.fetchone()
     if rows == None:
-        print("hola")
         cur.execute("""INSERT OR IGNORE INTO ContentSettings (automaticDownloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid) VALUES (?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?)""", 
                         (automaticDowloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid))
     else:
-       print("caca")
        cur.execute("""UPDATE ContentSettings SET automaticDownloads = ?, cookies = ?,images = ?,javaScript =? ,location = ?, plugins = ?, popups = ?, notifications = ?, fullScreen = ?, mouseLocks = ?, microphone = ?, camera = ?, unsandboxedPlugins = ? WHERE csuid = ?;""", 
                         (automaticDowloads, cookies,images,javaScript,location,plugins,popups,notifications,fullScreen,mouseLocks,microphone,camera,unsandboxedPlugins,csuid))
  
