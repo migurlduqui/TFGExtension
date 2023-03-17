@@ -180,7 +180,7 @@ function logSend(){
         headers:{"Content-Type": "application/json"}
         });})
     
-    loggingcontentSettings()
+    loggingcontentSettings();
     loggingprivacySettings();
 }
 
