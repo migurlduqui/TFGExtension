@@ -1,5 +1,6 @@
-"""
-Structure of the comments:
+
+"""Structure of the comments:
+
 The code will be divided by comments in sections. 
 Those sections are: Testing, Non_Database_Logging, Communication_Server_Extension, Database
 The first section as expected is for testing components of requests and how differents functions work.
@@ -30,10 +31,9 @@ First start an enviroment with flask, in my case:
 conda activate servers
 
 Then execute server with flask being PATH the path to app.py:
-flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
 
 """
-
+#flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
 #importing the necessary libraries
 import flask 
 from flask import Flask, request, jsonify #The most used function from flask
@@ -46,11 +46,12 @@ app = Flask(__name__,
             static_folder='Control/static',
             template_folder='Control/templates')
 
-"""
-GLOBAL VARIABLES
+"""GLOBAL VARIABLES
+
 DB_PATH = The path of the database
 MAL_FILE = the name of the malware file in "/Server/Control/files/" to be send to a download request
 """
+
 DB_PATH = __file__[:-6]+"DB\\test.sqlite"
 MAL_FILE = "prueba.exe"
 
@@ -59,7 +60,6 @@ MAL_FILE = "prueba.exe"
 route("/") with function hello_world has not use outside of being the root route
 route("/initialize") is used for cleaning and restarting any log file and DB
 route("/control_server") is used has a default post web for testing purposes
-
 """
 
 @app.route("/") #Root route for testing, not in use

