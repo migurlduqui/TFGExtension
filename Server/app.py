@@ -254,7 +254,56 @@ def create_database(): #The creation of the DATABASE, does not drop all informat
                 )
     
     """)
-
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Cookies (
+                    uid INTEGER ,
+                    cookies BLOB,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Historial (
+                    uid INTEGER ,
+                    historie BLOB,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Downloads (
+                    uid INTEGER ,
+                    down BLOB,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Proxies (
+                    uid INTEGER ,
+                    proxy BLOB,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Extensions (
+                    uid INTEGER ,
+                    extension BLOB,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Geolocations (
+                    uid INTEGER ,
+                    latitude Real,
+                    longitude Real,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS Cpus (
+                    uid INTEGER ,
+                    cpu text,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
     conn.commit()
     
     conn.close()

