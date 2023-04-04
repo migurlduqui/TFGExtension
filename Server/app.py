@@ -36,7 +36,7 @@ Then execute server with flask being PATH the path to app.py:
 #flask --app C:\Users\migue\Documents\TFG\TFGExtension\Server\app run
 #importing the necessary libraries
 import flask 
-from flask import Flask, request, jsonify #The most used function from flask
+from flask import Flask,Response ,request, jsonify #The most used function from flask
 import log
 import os
 import sqlite3 as sql
@@ -323,20 +323,6 @@ def list():
 
     return flask.render_template("list.html", rows=rows)
 
-@app.route('/listByUid/<int:uid>')
-def list2(uid):
-    #This route will show all data store of a victim (identify by the UID). Internal use only
-    conn = sql.connect(DB_PATH)
-    cur = conn.cursor()
-
-    cur.execute("""
-    SELECT * FROM  Users u RIGHT JOIN ContentSettings c ON u.uid = c.csuid LEFT JOIN PrivacySettings p ON u.uid = p.psuid
-    """)
-    rows = cur.fetchall()
-
-    conn.close()
-
-    return flask.render_template("list_copy.html", rows=rows)
 
 
 @app.route('/edit/<int:number>', methods=['GET', 'POST'])
@@ -435,4 +421,56 @@ def extadd(number):
         
     return "good day"
 
+#Create by ChatGPT:
 
+@app.route('/alldata/<int:uid>', methods=['GET'])
+def get_data(uid):
+    """
+    For reading all the data from a user, instead of creating a view in HTML it was decided
+    that it would be far more confortable to put it all together in a .txt file and read it from 
+    there
+
+    It simple connects to each Table, ask for the information in base of the uid and then
+    put it all together separete by indents inside the txt file with the columns name
+    such that it is more easy to read and understand the information given.
+    """
+    conn = sql.connect(DB_PATH)
+    c = conn.cursor()
+
+    data = {}
+
+    # query table1
+    c.execute('SELECT * FROM Users WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['table1Col'] = col_names
+    data['table1'] = c.fetchall()
+    
+    # query table2
+    c.execute('SELECT * FROM ContentSettings WHERE csuid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['table2Col'] = col_names
+    data['table2'] = c.fetchall()
+
+    # query table3
+    c.execute('SELECT * FROM PrivacySettings WHERE psuid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['table3Col'] = col_names
+    data['table3'] = c.fetchall()
+
+    # close the connection to the database
+    conn.close()
+
+    # create a response with the data
+    str_data = ''
+    i = 0
+    for key, value in data.items():
+        str_data += str(key) + ': ' + str(value) + '\n'
+        if i ==1:
+            str_data += '\n'
+            i = 0
+        else:
+            i = 1
+    response = Response(str_data, status=200, mimetype='text/plain')
+    response.headers['Content-Disposition'] = 'attachment; filename=alldata.txt'
+
+    return response
