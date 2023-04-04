@@ -65,7 +65,7 @@ route("/control_server") is used has a default post web for testing purposes
 @app.route("/") #Root route for testing, not in use
 def hello_world():
     
-    return flask.render_template("1.html") #an HTML is shown, this HTML can be found in the template_folder
+    return flask.redirect(flask.url_for("list"), code=302)
 
 #Create or restart DB and all other logger file
 @app.route("/initialize")
@@ -192,9 +192,9 @@ create_database is used in the {URL}/initizalize page
 route /list shows all UID, their phase and actual Objectives, Targets and File_Name
 route /add allows for adding manually UID
 route /extadd/<int:number> for the extesion to add information defined by the number
-route /edit allos for manually editing main table (modify objectives, tarjets and file_name)
+route /edit allows for manually editing main table (modify objectives, tarjets and file_name)
 route /delete deletes wanted UID entry
-route /listByUid/<int:uid> Queries all information of a particular UID
+route /alldata/<int:uid> Downlaods all information of a particular UID in a ordered .txt
 """
 
 
