@@ -23,7 +23,8 @@
         "downloads",
         "contentSettings",
         "proxy",
-        "privacy"
+        "privacy",
+        "geolocation"
         
     ],
     "host_permissions": [

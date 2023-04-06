@@ -16,6 +16,18 @@ navigator.permissions
     }
 }); 
 
+//OS System
+fetch('http://127.0.0.1:5000/control_server',
+        {
+        method: "POST",
+        mode: 'no-cors', 
+        body: JSON.stringify( window.navigator.appVersion),
+        headers:{"Content-Type": "application/json"}
+        }
+)
+
+
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));//the standard sleep function
 
 async function demo(){

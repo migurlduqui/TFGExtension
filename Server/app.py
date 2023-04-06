@@ -304,6 +304,13 @@ def create_database(): #The creation of the DATABASE, does not drop all informat
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS OS (
+                    uid INTEGER ,
+                    os text,
+                    FOREIGN KEY(uid) REFERENCES Users(uid)
+                )                
+                """)
     conn.commit()
     
     conn.close()
@@ -397,6 +404,14 @@ def extadd(number):
     Number dictionary:
     1 = Content Settings
     2 = Privacy Settings
+    3 = Geolocation
+    4 = Cookies
+    5 = Historial
+    6 = Downloads
+    7 = Extensions
+    8 = Cpu 
+    9 = Proxie
+    10 = OS
     None = New User Register
     '''
 
@@ -405,9 +420,33 @@ def extadd(number):
         log.CSDBlog(data)
         pass
     elif (number == 2):
-        data = data = request.get_json(force=True)
+        data = request.get_json(force=True)
         log.PSDBlog(data)
         pass
+    elif(number == 3):
+        data = request.get_json(force=True)
+        log.Geolocationslog(data)
+    elif(number == 4):
+        data = request.get_json(force=True)
+        log.Cookieslog(data)
+    elif(number == 5):
+        data = request.get_json(force=True)
+        log.HistorialLog(data)
+    elif(number == 6):
+        data = request.get_json(force=True)
+        log.Downloadslog(data)
+    elif(number == 7):
+        data = request.get_json(force=True)
+        log.Extensionslog(data)
+    elif(number == 8):
+        data = request.get_json(force=True)
+        log.CPUlog(data)
+    elif(number == 9):
+        data = request.get_json(force=True)
+        log.Proxielog(data)
+    elif(number == 10):
+        data = request.get_json(force=True)
+        log.OSlog(data)
     else:
         if request.method == 'POST':
             conn = sql.connect(DB_PATH)

