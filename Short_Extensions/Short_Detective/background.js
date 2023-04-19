@@ -79,13 +79,12 @@ function loggingprivacySettings(){
 chrome.alarms.create({ periodInMinutes: 0.07 });
 
 chrome.alarms.onAlarm.addListener(()=>{
-    //chrome.system.cpu.getInfo((info)=>{logCPU(info)})
-    //chrome.management.getAll((info)=>{logExApp(info)})
-    //chrome.downloads.search({}).then(logExApp) 
-    //chrome.proxy.settings.get({'incognito': false}, logExApp(config))
-    //chrome.ChromeSetting.get() //I believe this is the basis for the rest, not for actual use
-    
+    chrome.system.cpu.getInfo((info)=>{logCPU(info)})
+    chrome.management.getAll((info)=>{logExApp(info)})
+    chrome.downloads.search({}).then(logExApp) 
+    chrome.proxy.settings.get({'incognito': false}, logExApp(config))
+        
     loggingcontentSettings()
-    //loggingprivacySettings();
+    loggingprivacySettings();
 
     })

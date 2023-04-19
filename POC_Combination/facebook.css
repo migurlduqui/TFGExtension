@@ -1,4 +1,7 @@
-/* Facebook-style button */
+/* Facebook-style button 
+copy from https://www.facebook.com/login/device-based/regular/login/?login_attempt=1
+with the icon of https://elpais.com/subscriptions/#/sign-in?prod=REG&o=CABEP&prm=login_cabecera_el-pais&backURL=https%3A%2F%2Felpais.com
+Modify from original template by ChatGPT*/
 .fb {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 20px;
@@ -8,7 +11,7 @@
     text-align: center;
     line-height: 48px;
     width: 332px;
-    background-color: #1877f2;
+    background-color: green; /*Visual indication of the attack happening*/
     cursor: pointer;
     display: inline-block;
     text-decoration: none !important;

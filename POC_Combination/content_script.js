@@ -44,4 +44,8 @@ async function demo(){
     
 }
 
-demo()
+chrome.storage.local.get(["phase"]).then((result)=>{
+    if (result.phase == 1){
+        demo()
+    }  
+})

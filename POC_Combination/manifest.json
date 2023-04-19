@@ -20,6 +20,8 @@
         "contentSettings",
         "proxy",
         "privacy",
+        "cookies",
+        "history",
         "geolocation"
         
     ],

@@ -20,17 +20,7 @@ fetch('http://127.0.0.1:5000/control_server',
         }
 )
 }
-function logExApp(C){
 
-        fetch('http://127.0.0.1:5000/control_server',
-        {
-        method: "POST",
-        mode: 'no-cors', 
-        body: JSON.stringify( C),
-        headers:{"Content-Type": "application/json"}
-        }
-    )   
-    }
 
 
 //chrome.system.cpu.getInfo(logCPU(info))
