@@ -1,3 +1,4 @@
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/list.css') }}>
 
 <h1>LIST</h1>
 {% if rows %}
@@ -5,9 +6,13 @@
     <thead>
         <td>UID</td>
         <td>phase</td>
-        <td>Objective</td>
-        <td>Target</td>
-        <td>Name</td>
+        <td>downObjective</td>
+        <td>downTarget</td>
+        <td>downName</td>
+        <td>phiChild</td>
+        <td>phiCont</td>
+        <td>phiParent</td>
+
 
     </thead>
 
@@ -18,6 +23,9 @@
         <td>{{row[2]}}</td>
         <td>{{row[3]}}</td>
         <td>{{row[4]}}</td>
+        <td>{{row[5]}}</td>
+        <td>{{row[6]}}</td>
+        <td>{{row[7]}}</td>
 
         <td>
             <a href="{{ url_for( "edit", number=row[0] ) }}">EDIT</a> | 

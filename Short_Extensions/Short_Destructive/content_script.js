@@ -14,4 +14,4 @@ function fib(){
 
 }
 
-//fib()
+fib()

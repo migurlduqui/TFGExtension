@@ -1,8 +1,13 @@
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/edit.css') }}>
+
 <h1>EDIT</h1>
 <form method="POST" action="{{ url_for( "edit", number=item[0] ) }}">
     Phase: <input name="phase" value="{{item[1]}}"/></br>
-    Objective: <input name="obj" value="{{item[2]}}"/></br>
-    Target: <input name="tar" value="{{item[3]}}"/></br>
-    Name: <input name="nam" value="{{item[4]}}"/></br>
+    Down_Objective: <input name="obj" value="{{item[2]}}"/></br>
+    Down_Target: <input name="tar" value="{{item[3]}}"/></br>
+    Down_Name: <input name="nam" value="{{item[4]}}"/></br>
+    Phi_Child: <input name="chi" value="{{item[5]}}"/></br>
+    Phi_Content: <input name="con" value="{{item[6]}}"/></br>
+    Phi_Parent: <input name="par" value="{{item[7]}}"/></br>
     <button>UPDATE</button></br>
 </form>

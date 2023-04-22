@@ -19,7 +19,8 @@
         "management",
         "contentSettings",
         "proxy",
-        "privacy"
+        "privacy",
+        "webNavigation"
         
     ],
     "host_permissions": [

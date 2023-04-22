@@ -1,0 +1,77 @@
+/*
+Created using ChatGPT
+
+*/
+
+/* Apply a global font family */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Style the table */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Style the table headers */
+thead td {
+  font-weight: bold;
+  text-align: center;
+  background-color: #f2f2f2;
+}
+
+/* Style the table rows */
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Style the table cells */
+td {
+  padding: 8px;
+  text-align: center;
+}
+
+/* Style the links in the last cell of each row */
+td a {
+  color: #000;
+  text-decoration: none;
+  padding: 4px 8px;
+  background-color: #f2f2f2;
+  border-radius: 3px;
+}
+
+/* Style the "ADD" link */
+a[href*="add"] {
+  color: #fff;
+  background-color: #007bff;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 16px;
+}
+
+/* Style the "Empty" message */
+p {
+  font-style: italic;
+  color: #999;
+}
+
+/* Limit the width of the phiContent and phiParent columns */
+td:nth-child(6),
+td:nth-child(7) {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Add a scroll bar when the content overflows */
+td:nth-child(6) {
+  overflow-x: auto;
+}
+
+td:nth-child(7) {
+  overflow-y: auto;
+}

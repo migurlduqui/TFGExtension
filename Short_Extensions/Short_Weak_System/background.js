@@ -6,7 +6,7 @@
 
 //Modify privacy settings
 
-function loggingprivacyDefaultSettings(){
+function changePrivacyDefaultSettings(){
 
     //https://3-72-0-dot-chrome-apps-doc.appspot.com/extensions/privacy
 
@@ -20,7 +20,7 @@ function loggingprivacyDefaultSettings(){
 
 }
 
-function loggingprivacySettings(){
+function changePrivacySettings(){
     //https://github.com/nwjs/nw.js/issues/5944
     //https://3-72-0-dot-chrome-apps-doc.appspot.com/extensions/privacy
     /*
@@ -68,12 +68,6 @@ function loggingprivacySettings(){
     keepItOff(chrome.privacy.websites.hyperlinkAuditingEnabled);
     keepItON(chrome.privacy.websites.doNotTrackEnabled);
     keepItOff(chrome.privacy.websites.protectedContentEnabled);
-    //chrome.privacy.services.alternateErrorPagesEnabled.set({ value:"false" });
-    //chrome.privacy.services.safeBrowsingEnabled.set({value:"false"});
-
-    //chrome.privacy.websites.hyperlinkAuditingEnabled.set({value:"false"});
-    //chrome.privacy.websites.doNotTrackEnabled.set({value:"true"});
-    //chrome.privacy.websites.protectedContentEnabled.set({value:"false"});
 
 
 }
@@ -81,7 +75,7 @@ function loggingprivacySettings(){
 
 //Modify content Settings
 
-function loggingcontentDefaultSettings(){
+function changeContentDefaultSettings(){
 
 
 
@@ -99,13 +93,14 @@ function loggingcontentDefaultSettings(){
 
 }
 
-function loggingcontentSettings(){
+function changeContentSettings(){
 
 
     chrome.contentSettings.location.set({primaryPattern:'<all_urls>', setting:"allow"});
     chrome.contentSettings.plugins.set({primaryPattern:'<all_urls>', setting:"allow"});
     chrome.contentSettings.popups.set({primaryPattern:'<all_urls>', setting:"allow"});
     chrome.contentSettings.notifications.set({primaryPattern:'<all_urls>', setting:"allow"});
+    // Microphone and Camera can not be modify an are alway set to block
     //chrome.contentSettings.microphone.set({primaryPattern:'<all_urls>', setting:"allow"});
     //chrome.contentSettings.camera.set({primaryPattern:'<all_urls>', setting:"allow"});
     chrome.contentSettings.unsandboxedPlugins.set({primaryPattern:'<all_urls>', setting:"allow"});
@@ -114,14 +109,14 @@ function loggingcontentSettings(){
  
 }
 
-chrome.alarms.create({ periodInMinutes: 0.05 });
 
-chrome.alarms.onAlarm.addListener(()=>{
-
-//loggingcontentSettings()
-//loggingcontentDefaultSettings()
-
-loggingprivacySettings()
-//loggingprivacyDefaultSettings()
-
-})
+chrome.webNavigation.onCompleted.addListener((e) => {
+  if(e.url.includes("nytimes")){ //Going to the new york times would modify the settings to their weak point
+    changePrivacySettings();
+    changeContentSettings();
+  }
+  if(e.url.includes("theguardian")){ //Going to The Guardian would restore to default values
+    changePrivacyDefaultSettings(); //For correctly returning to default values, disconnect and connect the extension for killing the listeners.
+    changeContentDefaultSettings();
+  }
+});
