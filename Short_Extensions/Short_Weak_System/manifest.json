@@ -15,8 +15,6 @@
         }
       ],
     "permissions": [
-        "alarms",
-        "management",
         "contentSettings",
         "proxy",
         "privacy",

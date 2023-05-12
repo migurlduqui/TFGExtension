@@ -51,7 +51,15 @@ a[href*="add"] {
   display: inline-block;
   margin-top: 16px;
 }
-
+a[href*="reset"] {
+  color: #fff;
+  background-color: #ff0000;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 16px;
+}
 /* Style the "Empty" message */
 p {
   font-style: italic;

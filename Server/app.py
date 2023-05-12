@@ -65,14 +65,20 @@ route("/control_server") is used has a default post web for testing purposes
 @app.route("/") #Root route for testing, not in use
 def hello_world():
     
-    return flask.redirect(flask.url_for("list"), code=302)
+    return flask.render_template("home.html")
 
 #Create or restart DB and all other logger file
 @app.route("/initialize")
 def initialize():
     create_database()
-    return "Redoing all"
+    return "Initialicing Database"
 
+@app.route("/reset")
+def reset():
+    os.remove(DB_PATH)
+    f = open(DB_PATH,"x")
+    f.close()
+    return flask.redirect(flask.url_for("initialize"), code=302)
 
 
 #Default Post route 
@@ -156,6 +162,11 @@ route /alldata/<int:uid> Downlaods all information of a particular UID in a orde
 
 
 def create_database(): #The creation of the DATABASE, does not drop all information when restarted
+    try:
+        f = open(DB_PATH, "x")
+        f.close()
+    except:
+        print("file already there")
     conn = sql.connect(DB_PATH)
     cur = conn.cursor()
     #Users Table, store UID and general attack information, obj = Objective_URL_download, tar = Target_URL_Download, nam = Name_Download
