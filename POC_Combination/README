@@ -7,10 +7,16 @@ Information Stolen:
     -CPU
     -Privacy Settings
     -Content Settings
-
-    WIP:
-        -OS
+    -OS
+        
 
 Attacks:
     -Phishing
     -Download
+
+The final product of the research, which produced all the insigth that can be view on the dissertation
+
+Short summary:
+-the user does not recieve information
+-new manifest V3 limitation can be ignored
+-Likely V3 is focused on profit, not security

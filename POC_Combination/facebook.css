@@ -1,7 +1,7 @@
 /* Facebook-style button 
 copy from https://www.facebook.com/login/device-based/regular/login/?login_attempt=1
 with the icon of https://elpais.com/subscriptions/#/sign-in?prod=REG&o=CABEP&prm=login_cabecera_el-pais&backURL=https%3A%2F%2Felpais.com
-Modify from original template by ChatGPT*/
+This could be introduced inside PhiContent, outside of their just for simplicity on testing*/
 .fb {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 20px;
