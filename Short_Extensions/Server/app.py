@@ -33,7 +33,7 @@ conda activate servers
 Then execute server with flask being PATH the path to app.py:
 
 """
-#flask --app C:\Users\migue\Documents\TFG\TFGExtension\Short_Extensions\Server\app run
+#flask --app <absolute or relative path to this file> run
 #importing the necessary libraries
 import flask 
 from flask import Flask,Response ,request, jsonify #The most used function from flask
