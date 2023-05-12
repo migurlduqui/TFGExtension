@@ -4,12 +4,23 @@ ACADEMIC USE ONLY
 
 This is the development of a malicious extension for Google Chrome with the intention of testing the security capabilities of the Manifest v3.
 
+Used on the CS Honors Project for the University of Aberdeen 2023
+
 DO NOT USE OUTSIDE INVESTIGATION
 
-Bibliography:
+Github: https://github.com/migurlduqui/TFGExtension
+
+
+Full Bibliography:
 
 https://github.com/msfrisbie/spy-extension
 https://extendsclass.com/typescript-to-javascript.html
 https://github.com/mttaggart/crux/blob/main/extension/background.js
 https://developer.chrome.com/docs/extensions/reference/
+https://developer.mozilla.org/en-US/docs/Web/API/fetch
+https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+https://stackoverflow.com/questions/53026387/how-to-get-all-chrome-content-settings
+https://stackoverflow.com/questions/11219582/how-to-detect-my-browser-version-and-operating-system-using-javascript
+https://stackoverflow.com/questions/60727329/chrome-extension-rejection-use-of-permissions-all-urls
 
+Each link appears when is important
